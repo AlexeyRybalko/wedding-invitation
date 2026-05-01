@@ -13,6 +13,7 @@ import importantGift from './assets/important-gift.png'
 import importantMartini from './assets/important-martini.png'
 import introPhotoOne from './assets/intro-photo-1.jpg'
 import introPhotoTwo from './assets/intro-photo-2.jpg'
+import heartIcon from './assets/heart.svg'
 import olivePlate from './assets/olive-plate.png'
 import timerBackground from './assets/timer-background.png'
 
@@ -102,18 +103,30 @@ function App() {
     <main className="page">
       <div className="layout-frame">
         <section className="hero" aria-labelledby="hero-title">
-          <div className="hero-card">
-            <h1 id="hero-title" className="hero-title">
-              <span>Save</span>
-              <span>the Date</span>
-            </h1>
-            <p className="hero-names">Иван & Анастасия</p>
-            <div className="hero-divider" aria-hidden="true">
-              <span />
-              <small>♡</small>
-              <span />
+          <div className="hero-stage">
+            <div className="hero-save-date" aria-hidden="true">
+              <p>Save the date</p>
+              <img src={heartIcon} alt="" />
             </div>
-            <p className="hero-date">25.07.2026</p>
+
+            <div className="hero-invitation">
+              <h1 id="hero-title" className="hero-title">
+                <span>Приглашение</span>
+                <span>на свадьбу</span>
+              </h1>
+
+              <div className="hero-bottom">
+                <p className="hero-names">Иван & Анастасия</p>
+                <div className="hero-divider" aria-hidden="true">
+                  <span />
+                  <img src={heartIcon} alt="" />
+                  <span />
+                </div>
+                <p className="hero-date">25.07.2026</p>
+              </div>
+            </div>
+
+            <a className="hero-scroll" href="#intro-title" aria-label="Перейти к приглашению" />
           </div>
         </section>
 
