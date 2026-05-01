@@ -1,0 +1,88 @@
+@font-face {
+  font-family: 'Liana';
+  src: url('./assets/fonts/liana.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  color-scheme: light;
+  --color-dark-green: #1b4d3e;
+  --color-sage-green: #8fae93;
+  --color-warm-sand: #d2b48c;
+  --color-cream: #f5f5dc;
+  --color-text-main: #2f3a34;
+  --color-text-soft: #5f665f;
+  --color-border-light: #d9d3c7;
+  --color-card-background: #fbf8f1;
+  --color-soft-section-background: #efe7d8;
+
+  --color-page: var(--color-cream);
+  --color-surface: var(--color-card-background);
+  --color-accent: var(--color-dark-green);
+  --color-accent-soft: var(--color-sage-green);
+  --color-border: var(--color-border-light);
+  --color-text: var(--color-text-main);
+  --color-muted: var(--color-text-soft);
+
+  --font-heading: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+  --font-body: Manrope, Arial, sans-serif;
+  --font-script: Liana, 'Marck Script', Allura, 'Cormorant Garamond', cursive;
+
+  --page-max-width: 1474px;
+  --section-padding-x: 72px;
+  --section-padding-y: 72px;
+  --radius-card: 18px;
+  --shadow-soft: 0 18px 50px rgb(47 58 52 / 10%);
+
+  font-family: var(--font-body);
+  color: var(--color-text);
+  background: var(--color-page);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  min-width: 320px;
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.65;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+h1,
+h2,
+h3 {
+  color: var(--color-accent);
+  font-family: var(--font-heading);
+  font-weight: 500;
+  line-height: 0.98;
+}
+
+a {
+  color: inherit;
+}
