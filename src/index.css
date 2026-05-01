@@ -30,9 +30,9 @@
   --font-body: Manrope, Arial, sans-serif;
   --font-script: Liana, 'Marck Script', Allura, 'Cormorant Garamond', cursive;
 
-  --page-max-width: 1474px;
-  --section-padding-x: 72px;
-  --section-padding-y: 72px;
+  --page-max-width: 1600px;
+  --section-padding-x: 58px;
+  --section-padding-y: 86px;
   --radius-card: 18px;
   --shadow-soft: 0 18px 50px rgb(47 58 52 / 10%);
 

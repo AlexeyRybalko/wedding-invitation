@@ -193,6 +193,7 @@ function App() {
 
           <section className="important-section" aria-labelledby="important-title">
             <article className="important-card">
+              <img className="important-basket" src={importantBasket} alt="" aria-hidden="true" />
               <div className="important-heading">
                 <h2 id="important-title">О важном</h2>
                 <div className="important-divider" aria-hidden="true">
@@ -222,7 +223,6 @@ function App() {
                 </div>
               </div>
             </article>
-            <img className="important-basket" src={importantBasket} alt="" aria-hidden="true" />
           </section>
 
           <section className="dress-code" aria-labelledby="dress-code-title">
