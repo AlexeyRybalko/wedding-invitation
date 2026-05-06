@@ -11,10 +11,12 @@ import eventIconRings from './assets/event-icon-rings-round.png'
 import importantBasket from './assets/important-basket.png'
 import importantGift from './assets/important-gift.png'
 import importantMartini from './assets/important-martini.png'
-import introPhotoOne from './assets/intro-photo-1.jpg'
-import introPhotoTwo from './assets/intro-photo-2.jpg'
+import introPhotoOne from './assets/photocard-1.png'
+import introPhotoTwo from './assets/photocard-2.png'
+import heartFilledSageIcon from './assets/heart-filled-sage.svg'
 import heartIcon from './assets/heart.svg'
 import olivePlate from './assets/olive-plate.png'
+import phoneIcon from './assets/phone-vintage.png'
 import timerBackground from './assets/timer-background.png'
 
 const scheduleItems = [
@@ -178,7 +180,7 @@ function App() {
               <div className="venue-script">торжества</div>
               <div className="venue-divider" aria-hidden="true">
                 <span />
-                <small>♥</small>
+                <img src={heartFilledSageIcon} alt="" />
                 <span />
               </div>
               <div className="venue-name">Ресторан NOVO</div>
@@ -198,7 +200,7 @@ function App() {
                 <h2 id="important-title">О важном</h2>
                 <div className="important-divider" aria-hidden="true">
                   <span />
-                  <small>♡</small>
+                  <img src={heartIcon} alt="" />
                   <span />
                 </div>
               </div>
@@ -229,7 +231,7 @@ function App() {
             <h2 id="dress-code-title">Дресс-код</h2>
             <div className="dress-divider" aria-hidden="true">
               <span />
-              <small>♡</small>
+              <img src={heartIcon} alt="" />
               <span />
             </div>
             <p className="dress-lead">
@@ -251,14 +253,15 @@ function App() {
               <h2 id="surprises-title">Сюрпризы и поздравления</h2>
               <div className="surprises-divider" aria-hidden="true">
                 <span />
-                <small>♡</small>
+                <img src={heartIcon} alt="" />
                 <span />
               </div>
               <p className="surprises-text">
                 Если вы хотите подготовить творческий подарок или уточнить детали
-                программы, наш ведущий Дмитрий с радостью поможет вам в координации:
+                программы, наш ведущий с радостью поможет вам в координации
               </p>
               <div className="coordinator-contact">
+                <img src={phoneIcon} alt="" aria-hidden="true" />
                 <a href="tel:+79202986661" aria-label="Позвонить Дмитрию">
                   8 (920) 298-66-61
                 </a>
@@ -272,7 +275,7 @@ function App() {
               <h2>Анкета гостя</h2>
               <div className="final-divider" aria-hidden="true">
                 <span />
-                <small>♡</small>
+                <img src={heartIcon} alt="" />
                 <span />
               </div>
               <form className="rsvp-form" onSubmit={handleRsvpSubmit}>
@@ -308,7 +311,7 @@ function App() {
               <h2>До свадьбы осталось</h2>
               <div className="final-divider" aria-hidden="true">
                 <span />
-                <small>♡</small>
+                <img src={heartIcon} alt="" />
                 <span />
               </div>
               <CountdownTimer />
@@ -318,7 +321,7 @@ function App() {
               <h2>До встречи на нашей свадьбе!</h2>
               <div className="final-divider" aria-hidden="true">
                 <span />
-                <small>♡</small>
+                <img src={heartIcon} alt="" />
                 <span />
               </div>
             </div>
