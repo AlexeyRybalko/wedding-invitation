@@ -17,7 +17,11 @@ import heartFilledSageIcon from './assets/heart-filled-sage.svg'
 import heartIcon from './assets/heart.svg'
 import olivePlate from './assets/olive-plate.png'
 import phoneIcon from './assets/phone-vintage.png'
-import timerBackground from './assets/timer-background.png'
+
+const SECOND_MS = 1000
+const MINUTE_MS = 60 * SECOND_MS
+const HOUR_MS = 60 * MINUTE_MS
+const DAY_MS = 24 * HOUR_MS
 
 const scheduleItems = [
   {
@@ -38,14 +42,20 @@ const scheduleItems = [
     description: 'праздничного ужина',
     icon: eventIconDinner,
   },
-]
+] as const
 
 const dressColors = [
   { src: dressColorOne, alt: 'Тёмный зелёный оттенок' },
   { src: dressColorTwo, alt: 'Серо-зелёный оттенок' },
   { src: dressColorThree, alt: 'Песочный оттенок' },
   { src: dressColorFour, alt: 'Светлый молочный оттенок' },
-]
+] as const
+
+const rsvpOptions = [
+  'Обязательно приду',
+  'Буду со второй половинкой',
+  'Не смогу присутствовать',
+] as const
 
 const yandexMapEmbedUrl =
   'https://yandex.com/map-widget/v1/?ll=44.058481%2C56.322916&mode=poi&poi%5Bpoint%5D=44.058176%2C56.322930&poi%5Buri%5D=ymapsbm1%3A%2F%2Forg%3Foid%3D147439346278&z=17.3'
@@ -59,11 +69,41 @@ function getCountdownParts() {
   const remaining = Math.max(weddingDate.getTime() - Date.now(), 0)
 
   return {
-    days: Math.floor(remaining / 86_400_000),
-    hours: Math.floor((remaining % 86_400_000) / 3_600_000),
-    minutes: Math.floor((remaining % 3_600_000) / 60_000),
-    seconds: Math.floor((remaining % 60_000) / 1000),
+    days: Math.floor(remaining / DAY_MS),
+    hours: Math.floor((remaining % DAY_MS) / HOUR_MS),
+    minutes: Math.floor((remaining % HOUR_MS) / MINUTE_MS),
+    seconds: Math.floor((remaining % MINUTE_MS) / SECOND_MS),
   }
+}
+
+function plural(n: number, one: string, few: string, many: string) {
+  const mod10 = n % 10
+  const mod100 = n % 100
+
+  if (mod10 === 1 && mod100 !== 11) {
+    return one
+  }
+
+  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) {
+    return few
+  }
+
+  return many
+}
+
+type DecorativeDividerProps = {
+  className: string
+  icon: string
+}
+
+function DecorativeDivider({ className, icon }: DecorativeDividerProps) {
+  return (
+    <div className={className} aria-hidden="true">
+      <span />
+      <img src={icon} alt="" />
+      <span />
+    </div>
+  )
 }
 
 function CountdownTimer() {
@@ -78,10 +118,10 @@ function CountdownTimer() {
   }, [])
 
   const units = [
-    { value: countdown.days, label: 'дней' },
-    { value: countdown.hours, label: 'часов' },
-    { value: countdown.minutes, label: 'минут' },
-    { value: countdown.seconds, label: 'секунд' },
+    { value: countdown.days, label: plural(countdown.days, 'день', 'дня', 'дней') },
+    { value: countdown.hours, label: plural(countdown.hours, 'час', 'часа', 'часов') },
+    { value: countdown.minutes, label: plural(countdown.minutes, 'минута', 'минуты', 'минут') },
+    { value: countdown.seconds, label: plural(countdown.seconds, 'секунда', 'секунды', 'секунд') },
   ]
 
   return (
@@ -106,10 +146,7 @@ function App() {
       <div className="layout-frame">
         <section className="hero" aria-labelledby="hero-title">
           <div className="hero-stage">
-            <div className="hero-save-date" aria-hidden="true">
-              <p>Save the date</p>
-              <img src={heartIcon} alt="" />
-            </div>
+            <p className="hero-save-date" aria-hidden="true">Save the date</p>
 
             <div className="hero-invitation">
               <h1 id="hero-title" className="hero-title">
@@ -118,12 +155,8 @@ function App() {
               </h1>
 
               <div className="hero-bottom">
-                <p className="hero-names">Иван & Анастасия</p>
-                <div className="hero-divider" aria-hidden="true">
-                  <span />
-                  <img src={heartIcon} alt="" />
-                  <span />
-                </div>
+                <p className="hero-names">Иван&nbsp;&amp;&nbsp;Анастасия</p>
+                <DecorativeDivider className="hero-divider" icon={heartIcon} />
                 <p className="hero-date">25.07.2026</p>
               </div>
             </div>
@@ -178,13 +211,9 @@ function App() {
             <div className="map-details">
               <h2 className="venue-title">Место проведения</h2>
               <div className="venue-script">торжества</div>
-              <div className="venue-divider" aria-hidden="true">
-                <span />
-                <img src={heartFilledSageIcon} alt="" />
-                <span />
-              </div>
+              <DecorativeDivider className="venue-divider" icon={heartFilledSageIcon} />
               <div className="venue-name">Ресторан NOVO</div>
-              <div className="venue-address">Нижний Новгород, Печёрская слобода, 110А</div>
+              <div className="venue-address">Нижний&nbsp;Новгород, Печёрская слобода, 110А</div>
               <a href={yandexRouteUrl} target="_blank" rel="noreferrer">
                 Как проехать
               </a>
@@ -198,11 +227,7 @@ function App() {
               <img className="important-basket" src={importantBasket} alt="" aria-hidden="true" />
               <div className="important-heading">
                 <h2 id="important-title">О важном</h2>
-                <div className="important-divider" aria-hidden="true">
-                  <span />
-                  <img src={heartIcon} alt="" />
-                  <span />
-                </div>
+                <DecorativeDivider className="important-divider" icon={heartIcon} />
               </div>
 
               <div className="important-columns">
@@ -229,11 +254,7 @@ function App() {
 
           <section className="dress-code" aria-labelledby="dress-code-title">
             <h2 id="dress-code-title">Дресс-код</h2>
-            <div className="dress-divider" aria-hidden="true">
-              <span />
-              <img src={heartIcon} alt="" />
-              <span />
-            </div>
+            <DecorativeDivider className="dress-divider" icon={heartIcon} />
             <p className="dress-lead">
               Будем признательны, если при выборе нарядов вы поддержите палитру
               нашего праздника.
@@ -251,11 +272,7 @@ function App() {
           <section className="surprises-section" aria-labelledby="surprises-title">
             <article className="surprises-card">
               <h2 id="surprises-title">Сюрпризы и поздравления</h2>
-              <div className="surprises-divider" aria-hidden="true">
-                <span />
-                <img src={heartIcon} alt="" />
-                <span />
-              </div>
+              <DecorativeDivider className="surprises-divider" icon={heartIcon} />
               <p className="surprises-text">
                 Если вы хотите подготовить творческий подарок или уточнить детали
                 программы, наш ведущий с радостью поможет вам в координации
@@ -263,7 +280,7 @@ function App() {
               <div className="coordinator-contact">
                 <img src={phoneIcon} alt="" aria-hidden="true" />
                 <a href="tel:+79202986661" aria-label="Позвонить Дмитрию">
-                  8 (920) 298-66-61
+                  8&nbsp;(920)&nbsp;298-66-61
                 </a>
                 <span>Дмитрий</span>
               </div>
@@ -273,11 +290,7 @@ function App() {
           <section className="final-section" aria-label="Анкета гостя и обратный отсчёт">
             <article className="rsvp-card">
               <h2>Анкета гостя</h2>
-              <div className="final-divider" aria-hidden="true">
-                <span />
-                <img src={heartIcon} alt="" />
-                <span />
-              </div>
+              <DecorativeDivider className="final-divider" icon={heartIcon} />
               <form className="rsvp-form" onSubmit={handleRsvpSubmit}>
                 <label className="guest-name">
                   <span>Имя Фамилия</span>
@@ -286,44 +299,30 @@ function App() {
 
                 <fieldset>
                   <legend>Планируете ли присутствовать на свадьбе?</legend>
-                  <label>
-                    <input name="attendance" type="radio" value="Обязательно приду" />
-                    <span>Обязательно приду</span>
-                  </label>
-                  <label>
-                    <input name="attendance" type="radio" value="Буду со второй половинкой" />
-                    <span>Буду со второй половинкой</span>
-                  </label>
-                  <label>
-                    <input name="attendance" type="radio" value="Не смогу присутствовать" />
-                    <span>Не смогу присутствовать</span>
-                  </label>
+                  {rsvpOptions.map((option) => (
+                    <label key={option}>
+                      <input name="attendance" type="radio" value={option} />
+                      <span>{option}</span>
+                    </label>
+                  ))}
                 </fieldset>
 
                 <button type="submit">Отправить</button>
               </form>
             </article>
 
-            <article
-              className="timer-card"
-              style={{ backgroundImage: `url(${timerBackground})` }}
-            >
+            <article className="timer-card">
               <h2>До свадьбы осталось</h2>
-              <div className="final-divider" aria-hidden="true">
-                <span />
-                <img src={heartIcon} alt="" />
-                <span />
-              </div>
+              <DecorativeDivider className="final-divider" icon={heartIcon} />
               <CountdownTimer />
             </article>
 
             <div className="farewell">
-              <h2>До встречи на нашей свадьбе!</h2>
-              <div className="final-divider" aria-hidden="true">
-                <span />
-                <img src={heartIcon} alt="" />
-                <span />
-              </div>
+              <h2>
+                <span>До встречи</span>{' '}
+                <span>на нашей свадьбе</span>
+              </h2>
+              <DecorativeDivider className="final-divider" icon={heartIcon} />
             </div>
             <div className="bottom-background" aria-hidden="true" />
           </section>

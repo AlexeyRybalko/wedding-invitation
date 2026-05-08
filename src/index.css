@@ -11,7 +11,7 @@
   --color-dark-green: #1b4d3e;
   --color-sage-green: #8fae93;
   --color-warm-sand: #d2b48c;
-  --color-cream: #f5f5dc;
+  --color-cream: #f3ece7;
   --color-text-main: #2f3a34;
   --color-text-soft: #5f665f;
   --color-border-light: #d9d3c7;
@@ -91,6 +91,14 @@ h3 {
   font-family: var(--font-heading);
   font-weight: 500;
   line-height: 0.98;
+  hyphens: none;
+  text-wrap: balance;
+}
+
+p {
+  hyphens: none;
+  overflow-wrap: normal;
+  text-wrap: pretty;
 }
 
 a {
