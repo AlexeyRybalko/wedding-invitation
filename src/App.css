@@ -1208,15 +1208,12 @@
 
   .hero {
     --hero-mobile-width: 390;
-    --hero-mobile-height: 708;
-    --hero-mobile-bg: image-set(
-      url('./assets/mobile-hero-fixed-390.webp') type("image/webp"),
-      url('./assets/mobile-hero-fixed-390.png') type("image/png")
-    );
+    --hero-mobile-height: 761;
+    --hero-mobile-bg: url('./assets/mobile-hero-390.png');
     --hero-mobile-scale: calc(100vw / 390);
-    --hero-title-top: calc(var(--hero-mobile-scale) * 60);
+    --hero-title-top: calc(var(--hero-mobile-scale) * 140);
     --hero-title-to-bottom-gap: calc(var(--hero-mobile-scale) * 50);
-    --hero-arrow-bottom: calc(var(--hero-mobile-scale) * 220);
+    --hero-arrow-bottom: calc(var(--hero-mobile-scale) * 80);
     --hero-arrow-size: calc(var(--hero-mobile-scale) * 29.16);
 
     height: calc((100vw * var(--hero-mobile-height) / var(--hero-mobile-width)) + env(safe-area-inset-top, 0px));
@@ -1279,7 +1276,7 @@
     position: absolute;
     z-index: 1;
     top: auto;
-    bottom: calc(var(--hero-mobile-scale) * 265);
+    bottom: calc(var(--hero-mobile-scale) * 215);
     left: calc(50% - 0.06vw);
     display: block;
     width: calc(var(--hero-mobile-scale) * 270);
@@ -1356,33 +1353,24 @@
   @media (max-width: 382px) {
     .hero {
       --hero-mobile-width: 375;
-      --hero-mobile-height: 681;
-      --hero-mobile-bg: image-set(
-        url('./assets/mobile-hero-375.webp') type("image/webp"),
-        url('./assets/mobile-hero-375.png') type("image/png")
-      );
+      --hero-mobile-height: 731;
+      --hero-mobile-bg: url('./assets/mobile-hero-375.png');
     }
   }
 
   @media (min-width: 397px) and (max-width: 416px) {
     .hero {
       --hero-mobile-width: 402;
-      --hero-mobile-height: 730;
-      --hero-mobile-bg: image-set(
-        url('./assets/mobile-hero-402.webp') type("image/webp"),
-        url('./assets/mobile-hero-402.png') type("image/png")
-      );
+      --hero-mobile-height: 784;
+      --hero-mobile-bg: url('./assets/mobile-hero-402.png');
     }
   }
 
   @media (min-width: 417px) {
     .hero {
       --hero-mobile-width: 430;
-      --hero-mobile-height: 781;
-      --hero-mobile-bg: image-set(
-        url('./assets/mobile-hero-430.webp') type("image/webp"),
-        url('./assets/mobile-hero-430.png') type("image/png")
-      );
+      --hero-mobile-height: 839;
+      --hero-mobile-bg: url('./assets/mobile-hero-430.png');
     }
   }
 
@@ -1399,7 +1387,7 @@
     background-position:
       left -148px top 530px,
       right -152px top 610px,
-      left -235px top 2260px,
+      left -235px top 2140px,
       right -92px bottom 760px;
     background-size:
       610px auto,
@@ -1652,9 +1640,10 @@
   }
 
   .important-basket {
-    left: -52px;
-    width: 190px;
-    opacity: 0.48;
+    left: -6px;
+    bottom: -11px;
+    width: 230px;
+    opacity: 0.2;
   }
 
   .dress-code {
