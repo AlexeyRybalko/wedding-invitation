@@ -166,7 +166,7 @@
 .hero-scroll {
   position: absolute;
   z-index: 2;
-  bottom: 8.45%;
+  top: 14px;
   left: var(--hero-content-x);
   width: clamp(34px, 3.3vh, 62px);
   height: clamp(34px, 3.3vh, 62px);
@@ -1335,7 +1335,7 @@
   .hero-scroll {
     left: 50%;
     top: auto;
-    bottom: var(--hero-arrow-bottom);
+    bottom: 125px;
     width: var(--hero-arrow-size);
     height: var(--hero-arrow-size);
     transform: translateX(-50%);
@@ -1387,7 +1387,7 @@
     background-position:
       left -148px top 530px,
       right -152px top 610px,
-      left -235px top 2140px,
+      left -90px top 2170px,
       right -92px bottom 760px;
     background-size:
       610px auto,
