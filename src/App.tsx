@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import type { FormEvent, MouseEvent } from 'react'
+import type { CSSProperties, FormEvent, MouseEvent } from 'react'
 import './App.css'
 import bgContent from './assets/bg-cg-upscaled.webp'
 import bottomBackground from './assets/bottom-background.webp'
@@ -173,6 +173,13 @@ function waitForFonts() {
   return Promise.resolve()
 }
 
+function revealDelay(ms: number) {
+  return {
+    '--reveal-delay': `${ms}ms`,
+    '--reveal-mobile-delay': `${Math.round(ms * 0.42)}ms`,
+  } as CSSProperties
+}
+
 function getSafeAreaInsetTop() {
   const probe = document.createElement('div')
   probe.style.position = 'fixed'
@@ -217,11 +224,13 @@ function plural(n: number, one: string, few: string, many: string) {
 type DecorativeDividerProps = {
   className: string
   icon: string
+  reveal?: string
+  style?: CSSProperties
 }
 
-function DecorativeDivider({ className, icon }: DecorativeDividerProps) {
+function DecorativeDivider({ className, icon, reveal, style }: DecorativeDividerProps) {
   return (
-    <div className={className} aria-hidden="true">
+    <div className={className} aria-hidden="true" data-reveal={reveal} style={style}>
       <span />
       <img src={icon} alt="" />
       <span />
@@ -267,6 +276,22 @@ function App() {
   const [hasSubmittedRsvp, setHasSubmittedRsvp] = useState(() => window.sessionStorage.getItem('weddingRsvpSubmitted') === 'true')
 
   useEffect(() => {
+    const previousScrollRestoration = window.history.scrollRestoration
+
+    if ('scrollRestoration' in window.history) {
+      window.history.scrollRestoration = 'manual'
+    }
+
+    window.scrollTo(0, 0)
+
+    return () => {
+      if ('scrollRestoration' in window.history) {
+        window.history.scrollRestoration = previousScrollRestoration
+      }
+    }
+  }, [])
+
+  useEffect(() => {
     let isActive = true
     const imageAssets = getPageImageAssets()
 
@@ -284,6 +309,94 @@ function App() {
       isActive = false
     }
   }, [])
+
+  useEffect(() => {
+    if (!isPageReady) {
+      return undefined
+    }
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      document.querySelectorAll<HTMLElement>('[data-reveal]').forEach((element) => {
+        element.classList.add('is-visible')
+      })
+
+      return undefined
+    }
+
+    const pendingRevealElements = new Set<HTMLElement>()
+    let revealCheckFrame = 0
+
+    const revealElement = (element: Element) => {
+      element.classList.add('is-visible')
+      revealObserver.unobserve(element)
+      pendingRevealElements.delete(element as HTMLElement)
+    }
+
+    const getVisibleRatio = (element: HTMLElement) => {
+      const rect = element.getBoundingClientRect()
+      const viewportHeight = window.innerHeight || document.documentElement.clientHeight
+      const visibleHeight = Math.min(rect.bottom, viewportHeight) - Math.max(rect.top, 0)
+
+      if (visibleHeight <= 0) {
+        return 0
+      }
+
+      return visibleHeight / Math.min(rect.height || viewportHeight, viewportHeight)
+    }
+
+    const checkPendingRevealElements = () => {
+      revealCheckFrame = 0
+
+      pendingRevealElements.forEach((element) => {
+        if (getVisibleRatio(element) >= 0.4) {
+          revealElement(element)
+        }
+      })
+    }
+
+    const scheduleRevealCheck = () => {
+      if (revealCheckFrame) {
+        return
+      }
+
+      revealCheckFrame = window.requestAnimationFrame(checkPendingRevealElements)
+    }
+
+    const revealObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) {
+            return
+          }
+
+          revealElement(entry.target)
+        })
+      },
+      {
+        rootMargin: '0px 0px -18% 0px',
+        threshold: 0.2,
+      },
+    )
+
+    document.querySelectorAll<HTMLElement>('[data-reveal]').forEach((element) => {
+      pendingRevealElements.add(element)
+      revealObserver.observe(element)
+    })
+
+    scheduleRevealCheck()
+    window.addEventListener('scroll', scheduleRevealCheck, { passive: true })
+    window.addEventListener('resize', scheduleRevealCheck)
+
+    return () => {
+      revealObserver.disconnect()
+      window.removeEventListener('scroll', scheduleRevealCheck)
+      window.removeEventListener('resize', scheduleRevealCheck)
+
+      if (revealCheckFrame) {
+        window.cancelAnimationFrame(revealCheckFrame)
+      }
+    }
+  }, [isPageReady])
 
   useEffect(() => {
     const mapSrcTimer = window.setTimeout(() => setMapIframeSrc(yandexMapEmbedUrl), 0)
@@ -386,29 +499,29 @@ function App() {
         <div className="content-background">
           <section className="intro" aria-labelledby="intro-title">
             <div className="intro-copy">
-              <h2 id="intro-title">Дорогие гости!</h2>
-              <p>
+              <h2 id="intro-title" data-reveal="fade-up">Дорогие гости!</h2>
+              <p data-reveal="fade-up" style={revealDelay(120)}>
                 Мы верим, что этот день станет красивым началом нашей счастливой
                 совместной жизни, и очень хотим разделить этот радостный момент с вами!
               </p>
             </div>
 
             <div className="intro-photos" aria-label="Фотографии Ивана и Анастасии">
-              <img src={introPhotoOne} alt="Иван и Анастасия смотрят друг на друга" />
-              <img src={introPhotoTwo} alt="Иван и Анастасия улыбаются" />
+              <img data-reveal="photo-left" style={revealDelay(1500)} src={introPhotoOne} alt="Иван и Анастасия смотрят друг на друга" />
+              <img data-reveal="photo-right" style={revealDelay(1760)} src={introPhotoTwo} alt="Иван и Анастасия улыбаются" />
             </div>
           </section>
 
           <section className="event-location" aria-label="План мероприятия и место проведения">
-            <article className="event-card schedule-card">
-              <h2>План мероприятия</h2>
+            <article className="event-card schedule-card" data-reveal="card">
+              <h2 data-reveal="fade-up">План мероприятия</h2>
               <div className="schedule-list">
-                {scheduleItems.map((item) => (
-                  <div className="schedule-item" key={item.time}>
-                    <div className="schedule-icon">
+                {scheduleItems.map((item, index) => (
+                  <div className="schedule-item" key={item.time} data-reveal="fade-up" style={revealDelay(120 + index * 130)}>
+                    <div className="schedule-icon" data-reveal="scale-soft" style={revealDelay(170 + index * 130)}>
                       <img src={item.icon} alt="" aria-hidden="true" />
                     </div>
-                    <p>
+                    <p data-reveal="fade-up" style={revealDelay(210 + index * 130)}>
                       <time>{item.time}</time> — {item.title}
                       <span>{item.description}</span>
                     </p>
@@ -417,7 +530,7 @@ function App() {
               </div>
             </article>
 
-            <article className="event-card map-card">
+            <article className="event-card map-card" data-reveal="card" style={revealDelay(3000)}>
               <div className={`map-window${isMapReady ? ' is-map-ready' : ''}`}>
                 <img
                   className="map-placeholder"
@@ -434,40 +547,40 @@ function App() {
                 />
             </div>
             <div className="map-details">
-              <h2 className="venue-title">Место проведения</h2>
-              <div className="venue-script">торжества</div>
-              <DecorativeDivider className="venue-divider" icon={heartFilledSageIcon} />
-              <div className="venue-name">Ресторан NOVO</div>
-              <div className="venue-address">Нижний&nbsp;Новгород, Печёрская слобода, 110А</div>
-              <a href={yandexRouteUrl} target="_blank" rel="noreferrer">
+              <h2 className="venue-title" data-reveal="fade-up" style={revealDelay(320)}>Место проведения</h2>
+              <div className="venue-script" data-reveal="fade-up" style={revealDelay(430)}>торжества</div>
+              <DecorativeDivider className="venue-divider" icon={heartFilledSageIcon} reveal="line" style={revealDelay(520)} />
+              <div className="venue-name" data-reveal="fade-up" style={revealDelay(600)}>Ресторан NOVO</div>
+              <div className="venue-address" data-reveal="fade-up" style={revealDelay(700)}>Нижний&nbsp;Новгород, Печёрская слобода, 110А</div>
+              <a href={yandexRouteUrl} target="_blank" rel="noreferrer" data-reveal="fade-up" style={revealDelay(800)}>
                 Как проехать
               </a>
               </div>
+              <img className="olive-plate" src={olivePlate} alt="" aria-hidden="true" data-reveal="table-object" style={revealDelay(5400)} />
             </article>
-            <img className="olive-plate" src={olivePlate} alt="" aria-hidden="true" />
           </section>
 
           <section className="important-section" aria-labelledby="important-title">
-            <article className="important-card">
+            <article className="important-card" data-reveal="card">
               <img className="important-basket" src={importantBasket} alt="" aria-hidden="true" />
               <div className="important-heading">
-                <h2 id="important-title">О важном</h2>
-                <DecorativeDivider className="important-divider" icon={heartIcon} />
+                <h2 id="important-title" data-reveal="fade-up">О важном</h2>
+                <DecorativeDivider className="important-divider" icon={heartIcon} reveal="line" style={revealDelay(120)} />
               </div>
 
               <div className="important-columns">
-                <div className="important-item">
-                  <img src={importantGift} alt="" aria-hidden="true" />
-                  <p>
+                <div className="important-item" data-reveal="fade-up" style={revealDelay(220)}>
+                  <img src={importantGift} alt="" aria-hidden="true" data-reveal="scale-soft" style={revealDelay(300)} />
+                  <p data-reveal="fade-up" style={revealDelay(360)}>
                     Ваше присутствие и улыбки — главное для нас! Но если вы захотите
                     сделать подарок, мы будем рады вложению в бюджет нашей семьи.
                     Это поможет нам осуществить наши общие мечты.
                   </p>
                 </div>
 
-                <div className="important-item">
-                  <img src={importantMartini} alt="" aria-hidden="true" />
-                  <p>
+                <div className="important-item" data-reveal="fade-up" style={revealDelay(380)}>
+                  <img src={importantMartini} alt="" aria-hidden="true" data-reveal="scale-soft" style={revealDelay(460)} />
+                  <p data-reveal="fade-up" style={revealDelay(520)}>
                     Дорогие родители! Наш праздник — для взрослых. Очень надеемся,
                     что у вас будет возможность оставить детей на этот вечер под
                     присмотром и полностью погрузиться в атмосферу праздника вместе с нами.
@@ -478,32 +591,32 @@ function App() {
           </section>
 
           <section className="dress-code" aria-labelledby="dress-code-title">
-            <h2 id="dress-code-title">Дресс-код</h2>
-            <DecorativeDivider className="dress-divider" icon={heartIcon} />
-            <p className="dress-lead">
+            <h2 id="dress-code-title" data-reveal="fade-up">Дресс-код</h2>
+            <DecorativeDivider className="dress-divider" icon={heartIcon} reveal="line" style={revealDelay(120)} />
+            <p className="dress-lead" data-reveal="fade-up" style={revealDelay(220)}>
               Будем признательны, если при выборе нарядов вы поддержите палитру
               нашего праздника.
             </p>
             <div className="dress-palette" aria-label="Палитра дресс-кода">
-              {dressColors.map((color) => (
-                <img src={color.src} alt={color.alt} key={color.alt} />
+              {dressColors.map((color, index) => (
+                <img src={color.src} alt={color.alt} key={color.alt} data-reveal="scale-soft" style={revealDelay(320 + index * 110)} />
               ))}
             </div>
-            <p className="dress-note">
+            <p className="dress-note" data-reveal="fade-up" style={revealDelay(820)}>
               Дорогие дамы, большая просьба: избегайте белого цвета в своих нарядах.
             </p>
           </section>
 
           <section className="surprises-section" aria-labelledby="surprises-title">
-            <article className="surprises-card">
-              <h2 id="surprises-title">Сюрпризы и поздравления</h2>
-              <DecorativeDivider className="surprises-divider" icon={heartIcon} />
-              <p className="surprises-text">
+            <article className="surprises-card" data-reveal="card">
+              <h2 id="surprises-title" data-reveal="fade-up">Сюрпризы и поздравления</h2>
+              <DecorativeDivider className="surprises-divider" icon={heartIcon} reveal="line" style={revealDelay(120)} />
+              <p className="surprises-text" data-reveal="fade-up" style={revealDelay(240)}>
                 Если вы хотите подготовить творческий подарок или уточнить детали
                 программы, наш ведущий с радостью поможет вам в координации
               </p>
-              <div className="coordinator-contact">
-                <img src={phoneIcon} alt="" aria-hidden="true" />
+              <div className="coordinator-contact" data-reveal="fade-up" style={revealDelay(400)}>
+                <img src={phoneIcon} alt="" aria-hidden="true" data-reveal="phone-icon" style={revealDelay(500)} />
                 <a href="tel:+79202986661" aria-label="Позвонить Дмитрию">
                   8&nbsp;(920)&nbsp;298-66-61
                 </a>
@@ -513,19 +626,19 @@ function App() {
           </section>
 
           <section className="final-section" aria-label="Анкета гостя и обратный отсчёт">
-            <article className="rsvp-card">
-              <h2>Анкета гостя</h2>
-              <DecorativeDivider className="final-divider" icon={heartIcon} />
+            <article className="rsvp-card" data-reveal="card">
+              <h2 data-reveal="fade-up">Анкета гостя</h2>
+              <DecorativeDivider className="final-divider" icon={heartIcon} reveal="line" style={revealDelay(120)} />
               <form className="rsvp-form" onSubmit={handleRsvpSubmit}>
-                <label className="guest-name">
+                <label className="guest-name" data-reveal="fade-up" style={revealDelay(220)}>
                   <span>Представьтесь пожалуйста</span>
                   <input name="guestName" type="text" autoComplete="name" placeholder="Ваши имя и фамилия" required />
                 </label>
 
                 <fieldset>
-                  <legend>Планируете ли присутствовать на свадьбе?</legend>
+                  <legend data-reveal="fade-up" style={revealDelay(320)}>Планируете ли присутствовать на свадьбе?</legend>
                   {rsvpOptions.map((option, index) => (
-                    <label key={option}>
+                    <label key={option} data-reveal="fade-up" style={revealDelay(420 + index * 100)}>
                       <input name="attendance" type="radio" value={option} required={index === 0} />
                       <span>{option}</span>
                     </label>
@@ -543,20 +656,20 @@ function App() {
               </form>
             </article>
 
-            <article className="timer-card">
-              <h2>До свадьбы осталось</h2>
-              <DecorativeDivider className="final-divider" icon={heartIcon} />
+            <article className="timer-card" data-reveal="card" style={revealDelay(180)}>
+              <h2 data-reveal="fade-up">До свадьбы осталось</h2>
+              <DecorativeDivider className="final-divider" icon={heartIcon} reveal="line" style={revealDelay(120)} />
               <CountdownTimer />
             </article>
 
-            <div className="farewell">
+            <div className="farewell" data-reveal="farewell-line">
               <h2>
                 <span>До встречи</span>{' '}
                 <span>на нашей свадьбе</span>
               </h2>
-              <DecorativeDivider className="final-divider" icon={heartIcon} />
+              <DecorativeDivider className="final-divider farewell-divider" icon={heartIcon} />
             </div>
-            <div className="bottom-background" aria-hidden="true" />
+            <div className="bottom-background" aria-hidden="true" data-reveal="fade-in" />
           </section>
         </div>
       </div>
