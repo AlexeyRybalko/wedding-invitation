@@ -1,7 +1,94 @@
+.app-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 22px;
+  background:
+    radial-gradient(circle at 50% 44%, rgb(251 248 241 / 90%) 0 28%, rgb(243 236 231 / 96%) 62%, #f3ece7 100%);
+  color: var(--color-accent);
+  opacity: 1;
+  transition:
+    opacity 700ms ease,
+    visibility 0s linear 700ms;
+}
+
+.app-loader.is-hidden {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.app-loader-mark {
+  font-family: var(--font-heading);
+  font-size: clamp(48px, 9vw, 92px);
+  font-weight: 400;
+  line-height: 1;
+  opacity: 0.92;
+  animation: loader-breathe 1800ms ease-in-out infinite;
+}
+
+.app-loader-line {
+  position: relative;
+  width: min(180px, 44vw);
+  height: 1px;
+  overflow: hidden;
+  background: rgb(143 174 147 / 36%);
+}
+
+.app-loader-line::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  width: 42%;
+  background: rgb(27 77 62 / 68%);
+  animation: loader-line 1700ms ease-in-out infinite;
+}
+
+@keyframes loader-breathe {
+  0%,
+  100% {
+    opacity: 0.58;
+    transform: translateY(0);
+  }
+
+  50% {
+    opacity: 0.94;
+    transform: translateY(-2px);
+  }
+}
+
+@keyframes loader-line {
+  0% {
+    transform: translateX(-120%);
+  }
+
+  55% {
+    transform: translateX(82%);
+  }
+
+  100% {
+    transform: translateX(245%);
+  }
+}
+
 .page {
   min-height: 100svh;
   overflow-x: hidden;
   background: var(--color-page);
+  opacity: 1;
+  transition: opacity 700ms ease;
+}
+
+.page.is-page-loading {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.page.is-page-ready {
+  opacity: 1;
 }
 
 .layout-frame {
@@ -1730,6 +1817,10 @@
 
   .venue-script {
     font-size: clamp(54px, 16vw, 68px);
+    line-height: 0.76;
+    margin-top: 0;
+    margin-bottom: 12px;
+    transform: translateY(-8px);
   }
 
   .venue-divider {

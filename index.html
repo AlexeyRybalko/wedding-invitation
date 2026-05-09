@@ -19,10 +19,40 @@
       href="https://fonts.googleapis.com/css2?family=Allura&family=Cormorant+Garamond:wght@400;500;600;700&family=Manrope:wght@300;400;500;600;700&family=Marck+Script&display=swap"
       rel="stylesheet"
     />
+    <style>
+      .initial-loader {
+        position: fixed;
+        inset: 0;
+        display: grid;
+        align-content: center;
+        justify-items: center;
+        gap: 22px;
+        background: radial-gradient(circle at 50% 44%, rgb(251 248 241 / 90%) 0 28%, rgb(243 236 231 / 96%) 62%, #f3ece7 100%);
+        color: #1b4d3e;
+      }
+
+      .initial-loader__mark {
+        font-family: Georgia, 'Times New Roman', serif;
+        font-size: clamp(48px, 9vw, 92px);
+        line-height: 1;
+        opacity: 0.78;
+      }
+
+      .initial-loader__line {
+        width: min(180px, 44vw);
+        height: 1px;
+        background: rgb(143 174 147 / 48%);
+      }
+    </style>
     <title>Wedding Invitation</title>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <div class="initial-loader" aria-hidden="true">
+        <div class="initial-loader__mark">И&amp;А</div>
+        <div class="initial-loader__line"></div>
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

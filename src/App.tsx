@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react'
 import type { FormEvent, MouseEvent } from 'react'
 import './App.css'
+import bgContent from './assets/bg-cg-upscaled.webp'
+import bottomBackground from './assets/bottom-background.webp'
+import desktopBackground from './assets/desktop-background.webp'
 import dressColorOne from './assets/dress-color-1.png'
 import dressColorTwo from './assets/dress-color-2.png'
 import dressColorThree from './assets/dress-color-3.png'
@@ -8,16 +11,29 @@ import dressColorFour from './assets/dress-color-4.png'
 import eventIconDinner from './assets/event-icon-dinner-round.png'
 import eventIconGlasses from './assets/event-icon-glasses-round.png'
 import eventIconRings from './assets/event-icon-rings-round.png'
+import heroDesktop from './assets/hero-with-cg.webp'
 import importantBasket from './assets/important-basket.png'
 import importantGift from './assets/important-gift.png'
 import importantMartini from './assets/important-martini.png'
+import importantTexture from './assets/important-texture.webp'
 import introPhotoOne from './assets/photocard-1.png'
 import introPhotoTwo from './assets/photocard-2.png'
 import heartFilledSageIcon from './assets/heart-filled-sage.svg'
 import heartIcon from './assets/heart.svg'
 import mapPlaceholder from './assets/map-placeholder.png'
+import mobileHero375 from './assets/mobile-hero-375.png'
+import mobileHero390 from './assets/mobile-hero-390.png'
+import mobileHero402 from './assets/mobile-hero-402.png'
+import mobileHero430 from './assets/mobile-hero-430.png'
 import olivePlate from './assets/olive-plate.png'
+import oliveShadowOne from './assets/olive-shadow-1.webp'
+import oliveShadowTwo from './assets/olive-shadow-2.webp'
+import oliveShadowThree from './assets/olive-shadow-3.webp'
+import oliveShadowFour from './assets/olive-shadow-4.webp'
 import phoneIcon from './assets/phone-vintage.png'
+import surprisesBackground from './assets/surprises-background.webp'
+import surprisesMobileBackground from './assets/surprises-bg-mobile.webp'
+import timerBackground from './assets/timer-background.webp'
 
 const SECOND_MS = 1000
 const MINUTE_MS = 60 * SECOND_MS
@@ -66,6 +82,111 @@ const yandexRouteUrl =
 
 const weddingDate = new Date('2026-07-25T16:00:00+03:00')
 const rsvpEndpoint = ''
+const assetLoadTimeoutMs = 10000
+const minimumLoaderMs = 900
+
+const commonImageAssets = [
+  dressColorOne,
+  dressColorTwo,
+  dressColorThree,
+  dressColorFour,
+  eventIconDinner,
+  eventIconGlasses,
+  eventIconRings,
+  importantBasket,
+  importantGift,
+  importantMartini,
+  importantTexture,
+  introPhotoOne,
+  introPhotoTwo,
+  heartFilledSageIcon,
+  heartIcon,
+  mapPlaceholder,
+  olivePlate,
+  oliveShadowOne,
+  oliveShadowTwo,
+  oliveShadowThree,
+  oliveShadowFour,
+  phoneIcon,
+  timerBackground,
+] as const
+
+const desktopImageAssets = [
+  bgContent,
+  bottomBackground,
+  desktopBackground,
+  heroDesktop,
+  surprisesBackground,
+] as const
+
+const mobileImageAssets = [
+  desktopBackground,
+  mobileHero375,
+  mobileHero390,
+  mobileHero402,
+  mobileHero430,
+  surprisesMobileBackground,
+] as const
+
+function getPageImageAssets() {
+  const responsiveAssets = window.matchMedia('(max-width: 760px)').matches ? mobileImageAssets : desktopImageAssets
+
+  return [...commonImageAssets, ...responsiveAssets]
+}
+
+function wait(ms: number) {
+  return new Promise<void>((resolve) => {
+    window.setTimeout(resolve, ms)
+  })
+}
+
+function preloadImage(src: string) {
+  return new Promise<void>((resolve) => {
+    const image = new Image()
+    const finish = () => resolve()
+    const timeout = window.setTimeout(finish, assetLoadTimeoutMs)
+
+    image.onload = () => {
+      window.clearTimeout(timeout)
+
+      if ('decode' in image) {
+        image.decode().then(finish, finish)
+      } else {
+        finish()
+      }
+    }
+
+    image.onerror = () => {
+      window.clearTimeout(timeout)
+      finish()
+    }
+
+    image.src = src
+  })
+}
+
+function waitForFonts() {
+  if ('fonts' in document) {
+    return document.fonts.ready.then(() => undefined, () => undefined)
+  }
+
+  return Promise.resolve()
+}
+
+function getSafeAreaInsetTop() {
+  const probe = document.createElement('div')
+  probe.style.position = 'fixed'
+  probe.style.top = '0'
+  probe.style.paddingTop = 'env(safe-area-inset-top)'
+  probe.style.visibility = 'hidden'
+  document.body.append(probe)
+
+  const safeAreaTop = Number.parseFloat(window.getComputedStyle(probe).paddingTop) || 0
+
+  probe.remove()
+
+  return safeAreaTop
+}
 
 function getCountdownParts() {
   const remaining = Math.max(weddingDate.getTime() - Date.now(), 0)
@@ -139,10 +260,30 @@ function CountdownTimer() {
 }
 
 function App() {
+  const [isPageReady, setIsPageReady] = useState(false)
   const [isMapReady, setIsMapReady] = useState(false)
   const [mapIframeSrc, setMapIframeSrc] = useState('')
   const [rsvpStatus, setRsvpStatus] = useState<'idle' | 'success'>('idle')
   const [hasSubmittedRsvp, setHasSubmittedRsvp] = useState(() => window.sessionStorage.getItem('weddingRsvpSubmitted') === 'true')
+
+  useEffect(() => {
+    let isActive = true
+    const imageAssets = getPageImageAssets()
+
+    Promise.all([
+      Promise.all(imageAssets.map(preloadImage)),
+      waitForFonts(),
+      wait(minimumLoaderMs),
+    ]).then(() => {
+      if (isActive) {
+        setIsPageReady(true)
+      }
+    })
+
+    return () => {
+      isActive = false
+    }
+  }, [])
 
   useEffect(() => {
     const mapSrcTimer = window.setTimeout(() => setMapIframeSrc(yandexMapEmbedUrl), 0)
@@ -170,9 +311,11 @@ function App() {
     event.preventDefault()
 
     const heroBottom = window.scrollY + event.currentTarget.getBoundingClientRect().bottom
+    const safeAreaTop = getSafeAreaInsetTop()
+    const maxScrollTop = document.documentElement.scrollHeight - window.innerHeight
 
     window.scrollTo({
-      top: heroBottom,
+      top: Math.min(heroBottom + safeAreaTop, maxScrollTop),
       behavior: 'smooth',
     })
   }
@@ -210,7 +353,13 @@ function App() {
   }
 
   return (
-    <main className="page">
+    <>
+      <div className={`app-loader${isPageReady ? ' is-hidden' : ''}`} aria-hidden={isPageReady}>
+        <div className="app-loader-mark" aria-hidden="true">И&amp;А</div>
+        <div className="app-loader-line" aria-hidden="true" />
+      </div>
+
+    <main className={`page${isPageReady ? ' is-page-ready' : ' is-page-loading'}`} aria-hidden={!isPageReady}>
       <div className="layout-frame">
         <section className="hero" aria-labelledby="hero-title" onClick={handleHeroClick}>
           <div className="hero-stage">
@@ -412,6 +561,7 @@ function App() {
         </div>
       </div>
     </main>
+    </>
   )
 }
 
