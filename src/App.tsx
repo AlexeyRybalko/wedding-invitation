@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import type { FormEvent } from 'react'
+import type { FormEvent, MouseEvent } from 'react'
 import './App.css'
 import dressColorOne from './assets/dress-color-1.png'
 import dressColorTwo from './assets/dress-color-2.png'
@@ -15,6 +15,7 @@ import introPhotoOne from './assets/photocard-1.png'
 import introPhotoTwo from './assets/photocard-2.png'
 import heartFilledSageIcon from './assets/heart-filled-sage.svg'
 import heartIcon from './assets/heart.svg'
+import mapPlaceholder from './assets/map-placeholder.png'
 import olivePlate from './assets/olive-plate.png'
 import phoneIcon from './assets/phone-vintage.png'
 
@@ -64,6 +65,7 @@ const yandexRouteUrl =
   'https://yandex.com/maps/47/nizhny-novgorod/?rtext=~56.322930%2C44.058176&rtt=auto&z=17'
 
 const weddingDate = new Date('2026-07-25T16:00:00+03:00')
+const rsvpEndpoint = ''
 
 function getCountdownParts() {
   const remaining = Math.max(weddingDate.getTime() - Date.now(), 0)
@@ -137,14 +139,80 @@ function CountdownTimer() {
 }
 
 function App() {
-  const handleRsvpSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const [isMapReady, setIsMapReady] = useState(false)
+  const [mapIframeSrc, setMapIframeSrc] = useState('')
+  const [rsvpStatus, setRsvpStatus] = useState<'idle' | 'success'>('idle')
+  const [hasSubmittedRsvp, setHasSubmittedRsvp] = useState(() => window.sessionStorage.getItem('weddingRsvpSubmitted') === 'true')
+
+  useEffect(() => {
+    const mapSrcTimer = window.setTimeout(() => setMapIframeSrc(yandexMapEmbedUrl), 0)
+
+    return () => window.clearTimeout(mapSrcTimer)
+  }, [])
+
+  useEffect(() => {
+    if (!mapIframeSrc || isMapReady) {
+      return undefined
+    }
+
+    const mapRevealFallback = window.setTimeout(() => setIsMapReady(true), 7600)
+
+    return () => window.clearTimeout(mapRevealFallback)
+  }, [isMapReady, mapIframeSrc])
+
+  const handleHeroClick = (event: MouseEvent<HTMLElement>) => {
+    const target = event.target as HTMLElement
+
+    if (!target.closest('.hero-scroll')) {
+      return
+    }
+
     event.preventDefault()
+
+    const heroBottom = window.scrollY + event.currentTarget.getBoundingClientRect().bottom
+
+    window.scrollTo({
+      top: heroBottom,
+      behavior: 'smooth',
+    })
+  }
+
+  const handleRsvpSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+
+    if (hasSubmittedRsvp) {
+      setRsvpStatus('success')
+      return
+    }
+
+    const form = event.currentTarget
+    const formData = new FormData(form)
+    const payload = {
+      guestName: String(formData.get('guestName') ?? '').trim(),
+      attendance: String(formData.get('attendance') ?? ''),
+      submittedAt: new Date().toISOString(),
+    }
+
+    if (rsvpEndpoint) {
+      await fetch(rsvpEndpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload),
+      })
+    } else {
+      console.info('RSVP payload ready for endpoint:', payload)
+    }
+
+    setRsvpStatus('success')
+    setHasSubmittedRsvp(true)
+    window.sessionStorage.setItem('weddingRsvpSubmitted', 'true')
+    form.reset()
   }
 
   return (
     <main className="page">
       <div className="layout-frame">
-        <section className="hero" aria-labelledby="hero-title">
+        <section className="hero" aria-labelledby="hero-title" onClick={handleHeroClick}>
           <div className="hero-stage">
             <p className="hero-save-date" aria-hidden="true">Save the date</p>
 
@@ -163,6 +231,7 @@ function App() {
 
             <a className="hero-scroll" href="#intro-title" aria-label="Перейти к приглашению" />
           </div>
+          <a className="hero-scroll hero-scroll-screen" href="#intro-title" aria-label="Перейти к приглашению" />
         </section>
 
         <div className="content-background">
@@ -200,13 +269,20 @@ function App() {
             </article>
 
             <article className="event-card map-card">
-              <div className="map-window">
+              <div className={`map-window${isMapReady ? ' is-map-ready' : ''}`}>
+                <img
+                  className="map-placeholder"
+                  src={mapPlaceholder}
+                  alt="Карта ресторана NOVO"
+                  aria-hidden={isMapReady}
+                />
                 <iframe
-                  src={yandexMapEmbedUrl}
+                  src={mapIframeSrc}
                   title="Интерактивная карта места проведения свадьбы"
-                  loading="lazy"
+                  loading="eager"
                   referrerPolicy="no-referrer-when-downgrade"
-              />
+                  onLoad={() => mapIframeSrc && window.setTimeout(() => setIsMapReady(true), 1300)}
+                />
             </div>
             <div className="map-details">
               <h2 className="venue-title">Место проведения</h2>
@@ -293,21 +369,28 @@ function App() {
               <DecorativeDivider className="final-divider" icon={heartIcon} />
               <form className="rsvp-form" onSubmit={handleRsvpSubmit}>
                 <label className="guest-name">
-                  <span>Имя Фамилия</span>
-                  <input name="guestName" type="text" autoComplete="name" />
+                  <span>Представьтесь пожалуйста</span>
+                  <input name="guestName" type="text" autoComplete="name" placeholder="Ваши имя и фамилия" required />
                 </label>
 
                 <fieldset>
                   <legend>Планируете ли присутствовать на свадьбе?</legend>
-                  {rsvpOptions.map((option) => (
+                  {rsvpOptions.map((option, index) => (
                     <label key={option}>
-                      <input name="attendance" type="radio" value={option} />
+                      <input name="attendance" type="radio" value={option} required={index === 0} />
                       <span>{option}</span>
                     </label>
                   ))}
                 </fieldset>
 
-                <button type="submit">Отправить</button>
+                <button type="submit" disabled={hasSubmittedRsvp}>
+                  {hasSubmittedRsvp ? 'Ответ принят' : 'Отправить'}
+                </button>
+                {(rsvpStatus === 'success' || hasSubmittedRsvp) && (
+                  <p className="rsvp-status" role="status">
+                    Спасибо! Ответ принят.
+                  </p>
+                )}
               </form>
             </article>
 

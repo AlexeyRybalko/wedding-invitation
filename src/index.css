@@ -60,12 +60,14 @@
 }
 
 html {
+  overflow-x: hidden;
   scroll-behavior: smooth;
 }
 
 body {
   min-width: 320px;
   margin: 0;
+  overflow-x: hidden;
   font-size: 16px;
   line-height: 1.65;
 }
