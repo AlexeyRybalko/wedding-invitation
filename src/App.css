@@ -1793,6 +1793,7 @@
     gap: 34px;
     min-height: auto;
     padding: 58px clamp(28px, 5vw, 64px);
+    border-bottom: 0;
     overflow: hidden;
     text-align: center;
   }
@@ -2164,6 +2165,7 @@
     gap: 10px;
     min-height: auto;
     padding: 40px 22px 40px;
+    border-bottom: 0;
     overflow: hidden;
     text-align: center;
   }
@@ -2229,7 +2231,6 @@
 
   .schedule-card {
     min-height: auto;
-    border-top-color: transparent;
     padding: 30px 22px 32px;
   }
 
