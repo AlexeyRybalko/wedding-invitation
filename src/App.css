@@ -2229,6 +2229,7 @@
 
   .schedule-card {
     min-height: auto;
+    border-top-color: transparent;
     padding: 30px 22px 32px;
   }
 
