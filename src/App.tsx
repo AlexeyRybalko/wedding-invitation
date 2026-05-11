@@ -368,7 +368,7 @@ function App() {
         revealStartedAt.get(olivePlateElement) ?? 0,
       )
 
-      const remainingRevealMs = 5400 - (window.performance.now() - eventLocationRevealStartedAt)
+      const remainingRevealMs = 4200 - (window.performance.now() - eventLocationRevealStartedAt)
 
       if (remainingRevealMs <= 0) {
         return false
@@ -601,7 +601,7 @@ function App() {
               </div>
             </article>
 
-            <article className="event-card map-card" data-reveal="card" style={revealDelay(3000)}>
+            <article className="event-card map-card" data-reveal="card" style={revealDelay(1800)}>
               <div
                 className={`map-window${isMapReady ? ' is-map-ready' : ''}${isMapInteractive ? ' is-map-interactive' : ''}`}
                 onPointerDown={enableMapInteraction}
@@ -631,7 +631,7 @@ function App() {
                 Как проехать
               </a>
               </div>
-              <img className="olive-plate" src={olivePlate} alt="" aria-hidden="true" data-reveal="table-object" style={revealDelay(3060)} />
+              <img className="olive-plate" src={olivePlate} alt="" aria-hidden="true" data-reveal="table-object" style={revealDelay(1860)} />
             </article>
           </section>
 
