@@ -2284,8 +2284,12 @@
     filter: sepia(0.24) saturate(0.66) brightness(1.06) contrast(0.88);
   }
 
-  .map-window.is-map-ready iframe {
+  .map-window.is-map-ready:not(.is-map-interactive) iframe {
     pointer-events: none;
+  }
+
+  .map-window.is-map-interactive iframe {
+    pointer-events: auto;
   }
 
   .map-window::after {
@@ -3049,8 +3053,9 @@
   }
 
   .page.is-page-ready .hero-save-date {
-    animation-duration: 1250ms;
-    animation-delay: 1050ms;
+    opacity: 1;
+    clip-path: inset(0);
+    animation: none;
   }
 
   .page.is-page-ready .hero-title span,

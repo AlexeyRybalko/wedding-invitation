@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { CSSProperties, FormEvent, MouseEvent } from 'react'
 import './App.css'
 import bgContent from './assets/bg-cg-upscaled.webp'
@@ -271,9 +271,11 @@ function CountdownTimer() {
 function App() {
   const [isPageReady, setIsPageReady] = useState(false)
   const [isMapReady, setIsMapReady] = useState(false)
+  const [isMapInteractive, setIsMapInteractive] = useState(false)
   const [mapIframeSrc, setMapIframeSrc] = useState('')
   const [rsvpStatus, setRsvpStatus] = useState<'idle' | 'success'>('idle')
   const [hasSubmittedRsvp, setHasSubmittedRsvp] = useState(() => window.sessionStorage.getItem('weddingRsvpSubmitted') === 'true')
+  const mapInteractionTimerRef = useRef<number | null>(null)
 
   useEffect(() => {
     const previousScrollRestoration = window.history.scrollRestoration
@@ -424,6 +426,12 @@ function App() {
     return () => window.clearTimeout(mapSrcTimer)
   }, [])
 
+  useEffect(() => () => {
+    if (mapInteractionTimerRef.current) {
+      window.clearTimeout(mapInteractionTimerRef.current)
+    }
+  }, [])
+
   useEffect(() => {
     if (!mapIframeSrc || isMapReady) {
       return undefined
@@ -433,6 +441,23 @@ function App() {
 
     return () => window.clearTimeout(mapRevealFallback)
   }, [isMapReady, mapIframeSrc])
+
+  const enableMapInteraction = () => {
+    if (!isMapReady) {
+      return
+    }
+
+    setIsMapInteractive(true)
+
+    if (mapInteractionTimerRef.current) {
+      window.clearTimeout(mapInteractionTimerRef.current)
+    }
+
+    mapInteractionTimerRef.current = window.setTimeout(() => {
+      setIsMapInteractive(false)
+      mapInteractionTimerRef.current = null
+    }, 8000)
+  }
 
   const handleHeroClick = (event: MouseEvent<HTMLElement>) => {
     const target = event.target as HTMLElement
@@ -556,7 +581,11 @@ function App() {
             </article>
 
             <article className="event-card map-card" data-reveal="card" style={revealDelay(3000)}>
-              <div className={`map-window${isMapReady ? ' is-map-ready' : ''}`}>
+              <div
+                className={`map-window${isMapReady ? ' is-map-ready' : ''}${isMapInteractive ? ' is-map-interactive' : ''}`}
+                onPointerDown={enableMapInteraction}
+                onBlur={() => setIsMapInteractive(false)}
+              >
                 <img
                   className="map-placeholder"
                   src={mapPlaceholder}
