@@ -1950,6 +1950,12 @@
 }
 
 @media (max-width: 760px) {
+  .page,
+  .hero,
+  .hero-stage {
+    touch-action: pan-y;
+  }
+
   .layout-frame {
     width: 100%;
     box-shadow: none;
@@ -2267,6 +2273,22 @@
   .map-window {
     position: relative;
     height: 218px;
+  }
+
+  .map-window::before {
+    content: '';
+    position: absolute;
+    z-index: 4;
+    top: 50%;
+    left: 50%;
+    width: 34px;
+    height: 34px;
+    border: 1px solid rgb(198 67 56 / 48%);
+    border-radius: 50%;
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.72);
+    animation: map-pin-ring-mobile 2400ms cubic-bezier(0.22, 1, 0.36, 1) 700ms infinite;
+    pointer-events: none;
   }
 
   .map-window iframe {
@@ -2926,6 +2948,24 @@
     transform: translate3d(0, 10px, 0) scale(0.97);
   }
 
+  .schedule-card[data-reveal],
+  .schedule-card h2[data-reveal],
+  .schedule-item[data-reveal],
+  .schedule-icon[data-reveal],
+  .schedule-item p[data-reveal],
+  .map-card[data-reveal] {
+    --reveal-mobile-delay: 0ms !important;
+  }
+
+  .schedule-icon[data-reveal],
+  .schedule-item p[data-reveal] {
+    transition-delay: 70ms;
+  }
+
+  .schedule-item[data-reveal]::after {
+    transition-delay: 160ms;
+  }
+
   [data-reveal='line'] {
     transform: none;
   }
@@ -2944,6 +2984,7 @@
   .intro-photos img[data-reveal='photo-right'] {
     --photo-reveal-x: 0px;
     --photo-reveal-y: 12px;
+    --reveal-mobile-delay: 260ms !important;
 
     filter:
       blur(2px)
@@ -2967,23 +3008,24 @@
 
   .intro-photos img {
     transition:
-      opacity 1700ms cubic-bezier(0.22, 1, 0.36, 1) calc(var(--reveal-delay) + 100ms),
-      filter 1700ms cubic-bezier(0.22, 1, 0.36, 1) calc(var(--reveal-delay) + 100ms),
-      transform 1820ms cubic-bezier(0.22, 1, 0.36, 1) calc(var(--reveal-delay) + 100ms);
+      opacity 1550ms cubic-bezier(0.22, 1, 0.36, 1) calc(var(--reveal-mobile-delay) + 80ms),
+      filter 1550ms cubic-bezier(0.22, 1, 0.36, 1) calc(var(--reveal-mobile-delay) + 80ms),
+      transform 1680ms cubic-bezier(0.22, 1, 0.36, 1) calc(var(--reveal-mobile-delay) + 80ms);
   }
 
   .olive-plate[data-reveal='table-object'] {
     --olive-reveal-x: 0px;
-    --olive-reveal-y: 12px;
+    --olive-reveal-y: 18px;
     --olive-reveal-rotate: 0deg;
     --olive-reveal-scale: 1;
+    --reveal-mobile-delay: 120ms !important;
   }
 
   .olive-plate {
     transition:
-      opacity 1700ms cubic-bezier(0.22, 1, 0.36, 1) calc(var(--reveal-mobile-delay) + 100ms),
-      filter 1700ms cubic-bezier(0.22, 1, 0.36, 1) calc(var(--reveal-mobile-delay) + 100ms),
-      transform 1820ms cubic-bezier(0.22, 1, 0.36, 1) calc(var(--reveal-mobile-delay) + 100ms);
+      opacity 1600ms cubic-bezier(0.22, 1, 0.36, 1) calc(var(--reveal-mobile-delay) + 80ms),
+      filter 1600ms cubic-bezier(0.22, 1, 0.36, 1) calc(var(--reveal-mobile-delay) + 80ms),
+      transform 1780ms cubic-bezier(0.22, 1, 0.36, 1) calc(var(--reveal-mobile-delay) + 80ms);
   }
 
   .dress-palette img[data-reveal] {
@@ -3014,8 +3056,8 @@
   }
 
   .page.is-page-ready .hero-save-date {
-    animation-duration: 1900ms;
-    animation-delay: 2600ms;
+    animation-duration: 1250ms;
+    animation-delay: 1050ms;
   }
 
   .page.is-page-ready .hero-title span,
@@ -3024,19 +3066,61 @@
   .page.is-page-ready .hero-date {
     filter: blur(2px);
     transform: translate3d(0, 10px, 0);
-    animation-duration: 1400ms;
+    animation-duration: 980ms;
+  }
+
+  .page.is-page-ready .hero-title span:first-child {
+    animation-delay: 240ms;
+  }
+
+  .page.is-page-ready .hero-title span:last-child {
+    animation-delay: 360ms;
+  }
+
+  .page.is-page-ready .hero-names {
+    animation-delay: 520ms;
+  }
+
+  .page.is-page-ready .hero-divider {
+    animation-delay: 650ms;
+  }
+
+  .page.is-page-ready .hero-date {
+    animation-delay: 780ms;
   }
 
   .page.is-page-ready .hero-invitation {
-    animation-duration: 1500ms;
+    animation-duration: 1120ms;
   }
 
   .page.is-page-ready .hero-divider span {
-    animation-duration: 1400ms;
+    animation-duration: 980ms;
+    animation-delay: 700ms;
   }
 
   .page.is-page-ready .hero-divider img {
-    animation-duration: 1300ms;
+    animation-duration: 900ms;
+    animation-delay: 820ms;
+  }
+
+  .page.is-page-ready .hero-scroll {
+    animation-delay: 900ms;
+  }
+}
+
+@keyframes map-pin-ring-mobile {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.72);
+  }
+
+  24% {
+    opacity: 0.48;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1.55);
   }
 }
 
@@ -3116,5 +3200,11 @@
 
   .page.is-page-ready .hero-scroll {
     transform: translateX(-50%) !important;
+  }
+
+  .map-window::before {
+    animation: none !important;
+    opacity: 0.34 !important;
+    transform: translate(-50%, -50%) scale(1) !important;
   }
 }
