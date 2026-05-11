@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import type { CSSProperties, FormEvent, MouseEvent } from 'react'
+import type { CSSProperties, FormEvent } from 'react'
 import './App.css'
 import bgContent from './assets/bg-cg-upscaled.webp'
 import bottomBackground from './assets/bottom-background.webp'
@@ -178,21 +178,6 @@ function revealDelay(ms: number) {
     '--reveal-delay': `${ms}ms`,
     '--reveal-mobile-delay': `${Math.round(ms * 0.42)}ms`,
   } as CSSProperties
-}
-
-function getSafeAreaInsetTop() {
-  const probe = document.createElement('div')
-  probe.style.position = 'fixed'
-  probe.style.top = '0'
-  probe.style.paddingTop = 'env(safe-area-inset-top)'
-  probe.style.visibility = 'hidden'
-  document.body.append(probe)
-
-  const safeAreaTop = Number.parseFloat(window.getComputedStyle(probe).paddingTop) || 0
-
-  probe.remove()
-
-  return safeAreaTop
 }
 
 function getCountdownParts() {
@@ -459,26 +444,6 @@ function App() {
     }, 8000)
   }
 
-  const handleHeroClick = (event: MouseEvent<HTMLElement>) => {
-    const target = event.target as HTMLElement
-
-    if (!target.closest('.hero-scroll')) {
-      return
-    }
-
-    event.preventDefault()
-
-    const heroBottom = window.scrollY + event.currentTarget.getBoundingClientRect().bottom
-    const safeAreaTop = getSafeAreaInsetTop()
-    const maxScrollTop = document.documentElement.scrollHeight - window.innerHeight
-    const shouldUseInstantScroll = window.matchMedia('(max-width: 760px), (prefers-reduced-motion: reduce)').matches
-
-    window.scrollTo({
-      top: Math.min(heroBottom + safeAreaTop, maxScrollTop),
-      behavior: shouldUseInstantScroll ? 'auto' : 'smooth',
-    })
-  }
-
   const handleRsvpSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
@@ -524,7 +489,7 @@ function App() {
 
     <main className={`page${isPageReady ? ' is-page-ready' : ' is-page-loading'}`} aria-hidden={!isPageReady}>
       <div className="layout-frame">
-        <section className="hero" aria-labelledby="hero-title" onClick={handleHeroClick}>
+        <section className="hero" aria-labelledby="hero-title">
           <div className="hero-stage">
             <p className="hero-save-date" aria-hidden="true">Save the date</p>
 
@@ -541,9 +506,9 @@ function App() {
               </div>
             </div>
 
-            <a className="hero-scroll" href="#intro-title" aria-label="Перейти к приглашению" />
+            <span className="hero-scroll" aria-hidden="true" />
           </div>
-          <a className="hero-scroll hero-scroll-screen" href="#intro-title" aria-label="Перейти к приглашению" />
+          <span className="hero-scroll hero-scroll-screen" aria-hidden="true" />
         </section>
 
         <div className="content-background">
