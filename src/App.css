@@ -431,6 +431,7 @@
   width: clamp(34px, 3.3vh, 62px);
   height: clamp(34px, 3.3vh, 62px);
   transform: translateX(-50%);
+  pointer-events: none;
 }
 
 .hero-scroll::before {
@@ -2314,17 +2315,23 @@
   }
 
   .venue-script {
+    position: relative;
+    z-index: 1;
+    height: 0.72em;
     font-size: clamp(54px, 16vw, 68px);
-    line-height: 0.76;
-    margin-top: 0;
-    margin-bottom: 12px;
-    transform: translateY(-8px);
+    line-height: 0.68;
+    margin-top: -2px;
+    margin-bottom: -4px;
+    transform: translateY(-14px);
   }
 
   .venue-divider {
+    position: relative;
+    z-index: 2;
     grid-template-columns: 82px auto 82px;
     gap: 14px;
-    margin-bottom: 16px;
+    margin-top: -8px;
+    margin-bottom: 14px;
   }
 
   .venue-name {
@@ -3049,7 +3056,7 @@
   }
 
   .page.is-page-ready .hero-stage::before {
-    animation: hero-bg-intro-mobile 750ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation: none;
   }
 
   .page.is-page-ready .hero-save-date {
@@ -3062,47 +3069,52 @@
   .page.is-page-ready .hero-names,
   .page.is-page-ready .hero-divider,
   .page.is-page-ready .hero-date {
-    filter: blur(2px);
-    transform: translate3d(0, 10px, 0);
-    animation-duration: 980ms;
+    opacity: 1;
+    filter: blur(0);
+    transform: translate3d(0, 0, 0);
+    animation: none;
   }
 
   .page.is-page-ready .hero-title span:first-child {
-    animation-delay: 240ms;
+    animation-delay: 0ms;
   }
 
   .page.is-page-ready .hero-title span:last-child {
-    animation-delay: 360ms;
+    animation-delay: 0ms;
   }
 
   .page.is-page-ready .hero-names {
-    animation-delay: 520ms;
+    animation-delay: 0ms;
   }
 
   .page.is-page-ready .hero-divider {
-    animation-delay: 650ms;
+    animation-delay: 0ms;
   }
 
   .page.is-page-ready .hero-date {
-    animation-delay: 780ms;
+    animation-delay: 0ms;
   }
 
   .page.is-page-ready .hero-invitation {
-    animation-duration: 1120ms;
+    opacity: 1;
+    filter: none;
+    transform: translateX(-50%) translateY(0);
+    animation: none;
   }
 
   .page.is-page-ready .hero-divider span {
-    animation-duration: 980ms;
-    animation-delay: 700ms;
+    transform: scaleX(1);
+    animation: none;
   }
 
   .page.is-page-ready .hero-divider img {
-    animation-duration: 900ms;
-    animation-delay: 820ms;
+    opacity: 1;
+    transform: scale(1);
+    animation: none;
   }
 
   .page.is-page-ready .hero-scroll {
-    animation-delay: 900ms;
+    animation: none;
   }
 }
 
