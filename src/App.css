@@ -2321,17 +2321,14 @@
     font-size: clamp(54px, 16vw, 68px);
     line-height: 0.68;
     margin-top: -2px;
-    margin-bottom: -4px;
+    margin-bottom: 12px;
     transform: translateY(-14px);
   }
 
   .venue-divider {
-    position: relative;
-    z-index: 2;
     grid-template-columns: 82px auto 82px;
     gap: 14px;
-    margin-top: -8px;
-    margin-bottom: 14px;
+    margin-bottom: 16px;
   }
 
   .venue-name {
@@ -3056,65 +3053,59 @@
   }
 
   .page.is-page-ready .hero-stage::before {
-    animation: none;
+    animation: hero-bg-intro-mobile 750ms cubic-bezier(0.22, 1, 0.36, 1) both;
   }
 
   .page.is-page-ready .hero-save-date {
-    opacity: 1;
-    clip-path: inset(0);
-    animation: none;
+    animation-duration: 1250ms;
+    animation-delay: 1050ms;
   }
 
   .page.is-page-ready .hero-title span,
   .page.is-page-ready .hero-names,
   .page.is-page-ready .hero-divider,
   .page.is-page-ready .hero-date {
-    opacity: 1;
-    filter: blur(0);
-    transform: translate3d(0, 0, 0);
-    animation: none;
+    filter: blur(2px);
+    transform: translate3d(0, 10px, 0);
+    animation-duration: 980ms;
   }
 
   .page.is-page-ready .hero-title span:first-child {
-    animation-delay: 0ms;
+    animation-delay: 240ms;
   }
 
   .page.is-page-ready .hero-title span:last-child {
-    animation-delay: 0ms;
+    animation-delay: 360ms;
   }
 
   .page.is-page-ready .hero-names {
-    animation-delay: 0ms;
+    animation-delay: 520ms;
   }
 
   .page.is-page-ready .hero-divider {
-    animation-delay: 0ms;
+    animation-delay: 650ms;
   }
 
   .page.is-page-ready .hero-date {
-    animation-delay: 0ms;
+    animation-delay: 780ms;
   }
 
   .page.is-page-ready .hero-invitation {
-    opacity: 1;
-    filter: none;
-    transform: translateX(-50%) translateY(0);
-    animation: none;
+    animation-duration: 1120ms;
   }
 
   .page.is-page-ready .hero-divider span {
-    transform: scaleX(1);
-    animation: none;
+    animation-duration: 980ms;
+    animation-delay: 700ms;
   }
 
   .page.is-page-ready .hero-divider img {
-    opacity: 1;
-    transform: scale(1);
-    animation: none;
+    animation-duration: 900ms;
+    animation-delay: 820ms;
   }
 
   .page.is-page-ready .hero-scroll {
-    animation: none;
+    animation-delay: 900ms;
   }
 }
 

@@ -84,6 +84,20 @@ body {
   overflow-x: clip;
 }
 
+@media (max-width: 760px) {
+  html,
+  body,
+  #root {
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  body {
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+  }
+}
+
 button,
 input,
 textarea,
