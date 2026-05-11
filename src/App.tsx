@@ -325,6 +325,7 @@ function App() {
 
     const pendingRevealElements = new Set<HTMLElement>()
     let revealCheckFrame = 0
+    const mobileMotionQuery = window.matchMedia('(max-width: 760px)')
 
     const revealElement = (element: Element) => {
       element.classList.add('is-visible')
@@ -344,11 +345,25 @@ function App() {
       return visibleHeight / Math.min(rect.height || viewportHeight, viewportHeight)
     }
 
+    const shouldSequenceRevealWithScroll = (element: HTMLElement) =>
+      mobileMotionQuery.matches && Boolean(element.closest('.schedule-list'))
+
+    const shouldRevealElement = (element: HTMLElement) => {
+      if (!shouldSequenceRevealWithScroll(element)) {
+        return getVisibleRatio(element) >= 0.4
+      }
+
+      const rect = element.getBoundingClientRect()
+      const viewportHeight = window.innerHeight || document.documentElement.clientHeight
+
+      return rect.top <= viewportHeight * 0.64 && rect.bottom >= viewportHeight * 0.18
+    }
+
     const checkPendingRevealElements = () => {
       revealCheckFrame = 0
 
       pendingRevealElements.forEach((element) => {
-        if (getVisibleRatio(element) >= 0.4) {
+        if (shouldRevealElement(element)) {
           revealElement(element)
         }
       })
@@ -366,6 +381,11 @@ function App() {
       (entries) => {
         entries.forEach((entry) => {
           if (!entry.isIntersecting) {
+            return
+          }
+
+          if (shouldSequenceRevealWithScroll(entry.target as HTMLElement)) {
+            scheduleRevealCheck()
             return
           }
 
@@ -426,10 +446,11 @@ function App() {
     const heroBottom = window.scrollY + event.currentTarget.getBoundingClientRect().bottom
     const safeAreaTop = getSafeAreaInsetTop()
     const maxScrollTop = document.documentElement.scrollHeight - window.innerHeight
+    const shouldUseInstantScroll = window.matchMedia('(max-width: 760px), (prefers-reduced-motion: reduce)').matches
 
     window.scrollTo({
       top: Math.min(heroBottom + safeAreaTop, maxScrollTop),
-      behavior: 'smooth',
+      behavior: shouldUseInstantScroll ? 'auto' : 'smooth',
     })
   }
 

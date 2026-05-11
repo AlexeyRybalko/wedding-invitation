@@ -1951,8 +1951,13 @@
 
 @media (max-width: 760px) {
   .page,
+  .layout-frame,
   .hero,
-  .hero-stage {
+  .hero-stage,
+  .content-background,
+  .event-location,
+  .map-card,
+  .map-window {
     touch-action: pan-y;
   }
 
@@ -2275,24 +2280,12 @@
     height: 218px;
   }
 
-  .map-window::before {
-    content: '';
-    position: absolute;
-    z-index: 4;
-    top: 50%;
-    left: 50%;
-    width: 34px;
-    height: 34px;
-    border: 1px solid rgb(198 67 56 / 48%);
-    border-radius: 50%;
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(0.72);
-    animation: map-pin-ring-mobile 2400ms cubic-bezier(0.22, 1, 0.36, 1) 700ms infinite;
-    pointer-events: none;
-  }
-
   .map-window iframe {
     filter: sepia(0.24) saturate(0.66) brightness(1.06) contrast(0.88);
+  }
+
+  .map-window.is-map-ready iframe {
+    pointer-events: none;
   }
 
   .map-window::after {
@@ -3030,9 +3023,9 @@
 
   .dress-palette img[data-reveal] {
     transition:
-      opacity 1320ms cubic-bezier(0.16, 1, 0.3, 1) calc(var(--reveal-mobile-delay) + 100ms),
-      filter 1320ms cubic-bezier(0.16, 1, 0.3, 1),
-      transform 1320ms cubic-bezier(0.16, 1, 0.3, 1) calc(var(--reveal-mobile-delay) + 100ms);
+      opacity 1650ms cubic-bezier(0.16, 1, 0.3, 1) calc(var(--reveal-mobile-delay) + 100ms),
+      filter 1650ms cubic-bezier(0.16, 1, 0.3, 1),
+      transform 1650ms cubic-bezier(0.16, 1, 0.3, 1) calc(var(--reveal-mobile-delay) + 100ms);
   }
 
   .rsvp-form label[data-reveal],
@@ -3105,22 +3098,6 @@
 
   .page.is-page-ready .hero-scroll {
     animation-delay: 900ms;
-  }
-}
-
-@keyframes map-pin-ring-mobile {
-  0% {
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(0.72);
-  }
-
-  24% {
-    opacity: 0.48;
-  }
-
-  100% {
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(1.55);
   }
 }
 
@@ -3202,9 +3179,4 @@
     transform: translateX(-50%) !important;
   }
 
-  .map-window::before {
-    animation: none !important;
-    opacity: 0.34 !important;
-    transform: translate(-50%, -50%) scale(1) !important;
-  }
 }
