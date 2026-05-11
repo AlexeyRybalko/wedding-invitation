@@ -575,7 +575,7 @@ function App() {
                 Как проехать
               </a>
               </div>
-              <img className="olive-plate" src={olivePlate} alt="" aria-hidden="true" data-reveal="table-object" style={revealDelay(5400)} />
+              <img className="olive-plate" src={olivePlate} alt="" aria-hidden="true" data-reveal="table-object" style={revealDelay(3060)} />
             </article>
           </section>
 
