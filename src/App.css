@@ -2842,8 +2842,8 @@
       contrast(0.93)
       saturate(0.88)
       brightness(1.03)
-      drop-shadow(0 8px 14px rgb(70 52 34 / 14%))
-      drop-shadow(0 24px 42px rgb(105 82 52 / 18%));
+      drop-shadow(0 10px 16px rgb(70 52 34 / 18%))
+      drop-shadow(0 30px 52px rgb(105 82 52 / 24%));
     pointer-events: none;
     user-select: none;
   }
@@ -2857,7 +2857,7 @@
     width: 440px;
     height: 116px;
     border-radius: 50%;
-    background: rgb(70 50 30 / 20%);
+    background: rgb(70 50 30 / 24%);
     opacity: 0;
     filter: blur(26px);
     transform: rotate(-5deg) scale(0.94);
@@ -2868,7 +2868,7 @@
   }
 
   .event-location:has(.olive-plate.is-visible)::after {
-    opacity: 0.26;
+    opacity: 0.34;
     transform: rotate(-5deg) scale(1);
   }
 

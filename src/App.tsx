@@ -311,13 +311,18 @@ function App() {
     }
 
     const pendingRevealElements = new Set<HTMLElement>()
+    const revealStartedAt = new WeakMap<Element, number>()
     let revealCheckFrame = 0
+    let revealWakeTimer = 0
     const mobileMotionQuery = window.matchMedia('(max-width: 760px)')
+    const desktopMotionQuery = window.matchMedia('(min-width: 1200px)')
 
     const revealElement = (element: Element) => {
       element.classList.add('is-visible')
+      revealStartedAt.set(element, window.performance.now())
       revealObserver.unobserve(element)
       pendingRevealElements.delete(element as HTMLElement)
+      scheduleRevealCheck()
     }
 
     const getVisibleRatio = (element: HTMLElement) => {
@@ -335,7 +340,49 @@ function App() {
     const shouldSequenceRevealWithScroll = (element: HTMLElement) =>
       mobileMotionQuery.matches && Boolean(element.closest('.schedule-list'))
 
+    function scheduleDelayedRevealCheck(delayMs: number) {
+      if (revealWakeTimer) {
+        return
+      }
+
+      revealWakeTimer = window.setTimeout(() => {
+        revealWakeTimer = 0
+        scheduleRevealCheck()
+      }, delayMs)
+    }
+
+    const shouldWaitForEventLocationReveal = (element: HTMLElement) => {
+      if (!desktopMotionQuery.matches || !element.closest('.important-section')) {
+        return false
+      }
+
+      const mapCard = document.querySelector<HTMLElement>('.map-card[data-reveal]')
+      const olivePlateElement = document.querySelector<HTMLElement>('.olive-plate[data-reveal]')
+
+      if (!mapCard?.classList.contains('is-visible') || !olivePlateElement?.classList.contains('is-visible')) {
+        return true
+      }
+
+      const eventLocationRevealStartedAt = Math.max(
+        revealStartedAt.get(mapCard) ?? 0,
+        revealStartedAt.get(olivePlateElement) ?? 0,
+      )
+
+      const remainingRevealMs = 5400 - (window.performance.now() - eventLocationRevealStartedAt)
+
+      if (remainingRevealMs <= 0) {
+        return false
+      }
+
+      scheduleDelayedRevealCheck(remainingRevealMs + 80)
+      return true
+    }
+
     const shouldRevealElement = (element: HTMLElement) => {
+      if (shouldWaitForEventLocationReveal(element)) {
+        return false
+      }
+
       if (!shouldSequenceRevealWithScroll(element)) {
         return getVisibleRatio(element) >= 0.4
       }
@@ -376,6 +423,11 @@ function App() {
             return
           }
 
+          if (shouldWaitForEventLocationReveal(entry.target as HTMLElement)) {
+            scheduleRevealCheck()
+            return
+          }
+
           revealElement(entry.target)
         })
       },
@@ -401,6 +453,10 @@ function App() {
 
       if (revealCheckFrame) {
         window.cancelAnimationFrame(revealCheckFrame)
+      }
+
+      if (revealWakeTimer) {
+        window.clearTimeout(revealWakeTimer)
       }
     }
   }, [isPageReady])
