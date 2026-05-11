@@ -81,7 +81,7 @@ const yandexRouteUrl =
   'https://yandex.com/maps/47/nizhny-novgorod/?rtext=~56.322930%2C44.058176&rtt=auto&z=17'
 
 const weddingDate = new Date('2026-07-25T16:00:00+03:00')
-const rsvpEndpoint = ''
+const rsvpEndpoint = import.meta.env.VITE_RSVP_ENDPOINT?.trim() ?? ''
 const assetLoadTimeoutMs = 10000
 const minimumLoaderMs = 900
 
@@ -444,14 +444,18 @@ function App() {
     const form = event.currentTarget
     const formData = new FormData(form)
     const payload = {
+      submittedAt: new Date().toISOString(),
       guestName: String(formData.get('guestName') ?? '').trim(),
       attendance: String(formData.get('attendance') ?? ''),
-      submittedAt: new Date().toISOString(),
+      pageUrl: window.location.href,
+      userAgent: window.navigator.userAgent,
     }
 
     if (rsvpEndpoint) {
       await fetch(rsvpEndpoint, {
         method: 'POST',
+        mode: 'no-cors',
+        keepalive: true,
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify(payload),
       })
