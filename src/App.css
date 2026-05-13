@@ -1730,6 +1730,22 @@
   transform: translateX(-4px);
 }
 
+.rsvp-form button.rsvp-submit-button.is-submitting[data-reveal],
+.rsvp-form button.rsvp-submit-button.is-submitted[data-reveal],
+.rsvp-form button.rsvp-submit-button.is-submitted[data-reveal]:hover {
+  opacity: 1;
+  filter: none;
+  transform: translate3d(0, 0, 0);
+  transition:
+    box-shadow 220ms ease,
+    background-color 220ms ease,
+    border-color 220ms ease;
+}
+
+.rsvp-submit-button.is-submitted::before {
+  animation: none;
+}
+
 .rsvp-card.is-visible .rsvp-form button[data-reveal] {
   opacity: 1;
   filter: none;
