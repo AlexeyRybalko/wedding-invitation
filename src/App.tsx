@@ -262,7 +262,8 @@ function App() {
   const [isMapReady, setIsMapReady] = useState(false)
   const [isMapInteractive, setIsMapInteractive] = useState(false)
   const [mapIframeSrc, setMapIframeSrc] = useState('')
-  const [rsvpStatus, setRsvpStatus] = useState<'idle' | 'success'>('idle')
+  const [rsvpStatus, setRsvpStatus] = useState<'idle' | 'success' | 'error'>('idle')
+  const [isRsvpSubmitting, setIsRsvpSubmitting] = useState(false)
   const [hasSubmittedRsvp, setHasSubmittedRsvp] = useState(() => window.sessionStorage.getItem('weddingRsvpSubmitted') === 'true')
   const mapInteractionTimerRef = useRef<number | null>(null)
 
@@ -592,7 +593,7 @@ function App() {
   const handleRsvpSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
-    if (hasSubmittedRsvp) {
+    if (hasSubmittedRsvp || isRsvpSubmitting) {
       setRsvpStatus('success')
       return
     }
@@ -607,22 +608,32 @@ function App() {
       userAgent: window.navigator.userAgent,
     }
 
-    if (rsvpEndpoint) {
-      await fetch(rsvpEndpoint, {
-        method: 'POST',
-        mode: 'no-cors',
-        keepalive: true,
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify(payload),
-      })
-    } else {
-      console.info('RSVP payload ready for endpoint:', payload)
-    }
+    setIsRsvpSubmitting(true)
+    setRsvpStatus('idle')
 
-    setRsvpStatus('success')
-    setHasSubmittedRsvp(true)
-    window.sessionStorage.setItem('weddingRsvpSubmitted', 'true')
-    form.reset()
+    try {
+      if (rsvpEndpoint) {
+        await fetch(rsvpEndpoint, {
+          method: 'POST',
+          mode: 'no-cors',
+          keepalive: true,
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(payload),
+        })
+      } else {
+        console.info('RSVP payload ready for endpoint:', payload)
+      }
+
+      setRsvpStatus('success')
+      setHasSubmittedRsvp(true)
+      window.sessionStorage.setItem('weddingRsvpSubmitted', 'true')
+      form.reset()
+    } catch (error) {
+      console.error('RSVP submit failed:', error)
+      setRsvpStatus('error')
+    } finally {
+      setIsRsvpSubmitting(false)
+    }
   }
 
   return (
@@ -811,12 +822,31 @@ function App() {
                   ))}
                 </fieldset>
 
-                <button type="submit" disabled={hasSubmittedRsvp} data-reveal="fade-up" style={revealDelay(760)}>
-                  {hasSubmittedRsvp ? 'Ответ принят' : 'Отправить'}
+                <button
+                  type="submit"
+                  className={`rsvp-submit-button${isRsvpSubmitting ? ' is-submitting' : ''}`}
+                  disabled={hasSubmittedRsvp || isRsvpSubmitting}
+                  aria-busy={isRsvpSubmitting}
+                  data-reveal="fade-up"
+                  style={revealDelay(760)}
+                >
+                  <span className="rsvp-submit-label">
+                    {hasSubmittedRsvp ? 'Ответ принят' : isRsvpSubmitting ? 'Отправляем' : 'Отправить'}
+                  </span>
+                  <span className="rsvp-submit-loader" aria-hidden="true">
+                    <span />
+                    <span />
+                    <span />
+                  </span>
                 </button>
                 {(rsvpStatus === 'success' || hasSubmittedRsvp) && (
                   <p className="rsvp-status" role="status">
                     Спасибо! Ответ принят.
+                  </p>
+                )}
+                {rsvpStatus === 'error' && (
+                  <p className="rsvp-status is-error" role="status">
+                    Не удалось отправить ответ. Попробуйте ещё раз.
                   </p>
                 )}
               </form>
