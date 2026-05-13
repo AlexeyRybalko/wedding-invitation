@@ -1977,8 +1977,8 @@
     --hero-mobile-scale: max(calc(100vw / var(--hero-mobile-width)), calc(100svh / var(--hero-mobile-height)));
     --hero-title-top: calc(var(--hero-mobile-scale) * 140);
     --hero-title-to-bottom-gap: calc(var(--hero-mobile-scale) * 50);
-    --hero-save-date-top: calc(var(--hero-title-top) + (var(--hero-mobile-scale) * 368));
-    --hero-arrow-top: calc(var(--hero-title-top) + (var(--hero-mobile-scale) * 467));
+    --hero-save-date-top: calc(var(--hero-title-top) + (var(--hero-mobile-scale) * 402));
+    --hero-arrow-top: calc(var(--hero-title-top) + (var(--hero-mobile-scale) * 487));
     --hero-arrow-size: calc(var(--hero-mobile-scale) * 29.16);
 
     height: 100svh;
