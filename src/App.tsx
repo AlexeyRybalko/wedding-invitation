@@ -143,12 +143,19 @@ function wait(ms: number) {
 function preloadImage(src: string) {
   return new Promise<void>((resolve) => {
     const image = new Image()
-    const finish = () => resolve()
+    let isSettled = false
+    const finish = () => {
+      if (isSettled) {
+        return
+      }
+
+      isSettled = true
+      window.clearTimeout(timeout)
+      resolve()
+    }
     const timeout = window.setTimeout(finish, assetLoadTimeoutMs)
 
     image.onload = () => {
-      window.clearTimeout(timeout)
-
       if ('decode' in image) {
         image.decode().then(finish, finish)
       } else {
@@ -156,10 +163,7 @@ function preloadImage(src: string) {
       }
     }
 
-    image.onerror = () => {
-      window.clearTimeout(timeout)
-      finish()
-    }
+    image.onerror = finish
 
     image.src = src
   })
@@ -235,16 +239,16 @@ function CountdownTimer() {
   }, [])
 
   const units = [
-    { value: countdown.days, label: plural(countdown.days, 'день', 'дня', 'дней') },
-    { value: countdown.hours, label: plural(countdown.hours, 'час', 'часа', 'часов') },
-    { value: countdown.minutes, label: plural(countdown.minutes, 'минута', 'минуты', 'минут') },
-    { value: countdown.seconds, label: plural(countdown.seconds, 'секунда', 'секунды', 'секунд') },
+    { id: 'days', value: countdown.days, label: plural(countdown.days, 'день', 'дня', 'дней') },
+    { id: 'hours', value: countdown.hours, label: plural(countdown.hours, 'час', 'часа', 'часов') },
+    { id: 'minutes', value: countdown.minutes, label: plural(countdown.minutes, 'минута', 'минуты', 'минут') },
+    { id: 'seconds', value: countdown.seconds, label: plural(countdown.seconds, 'секунда', 'секунды', 'секунд') },
   ]
 
   return (
-    <div className="timer-grid" aria-label="Обратный отсчёт до свадьбы">
-      {units.map((unit) => (
-        <div className="timer-unit" key={unit.label}>
+    <div className="timer-grid" aria-label="Обратный отсчёт до свадьбы" data-reveal="fade-up" style={revealDelay(260)}>
+      {units.map((unit, index) => (
+        <div className="timer-unit" key={unit.id} data-reveal="scale-soft" style={revealDelay(340 + index * 90)}>
           <strong>{unit.value}</strong>
           <span>{unit.label}</span>
         </div>
@@ -314,8 +318,10 @@ function App() {
     const revealStartedAt = new WeakMap<Element, number>()
     let revealCheckFrame = 0
     let revealWakeTimer = 0
+    let revealWakeDueAt = 0
     const mobileMotionQuery = window.matchMedia('(max-width: 760px)')
     const desktopMotionQuery = window.matchMedia('(min-width: 1200px)')
+    const revealVisibleRatio = 0.32
 
     const revealElement = (element: Element) => {
       element.classList.add('is-visible')
@@ -338,15 +344,70 @@ function App() {
     }
 
     const shouldSequenceRevealWithScroll = (element: HTMLElement) =>
-      mobileMotionQuery.matches && Boolean(element.closest('.schedule-list'))
+      mobileMotionQuery.matches &&
+      Boolean(
+        element.closest('.intro') ||
+          element.closest('.event-location') ||
+          element.closest('.important-section') ||
+          element.closest('.dress-code') ||
+          element.closest('.surprises-section') ||
+          element.closest('.rsvp-card') ||
+          element.closest('.timer-card') ||
+          element.closest('.farewell'),
+      )
+
+    const shouldRevealIntroElement = (element: HTMLElement) => {
+      if (!mobileMotionQuery.matches || !element.closest('.intro')) {
+        return false
+      }
+
+      const rect = element.getBoundingClientRect()
+      const viewportHeight = window.innerHeight || document.documentElement.clientHeight
+
+      return rect.top <= viewportHeight * 0.86 && rect.bottom >= viewportHeight * 0.08
+    }
+
+    const shouldRevealFarewellElement = (element: HTMLElement) => {
+      if (!mobileMotionQuery.matches || !element.closest('.farewell')) {
+        return false
+      }
+
+      const rect = element.getBoundingClientRect()
+      const viewportHeight = window.innerHeight || document.documentElement.clientHeight
+
+      return rect.top <= viewportHeight * 0.82 && rect.bottom >= viewportHeight * 0.04
+    }
+
+    const getScrollResponsiveWaitMs = (element: HTMLElement, baseWaitMs: number, urgentWaitMs: number) => {
+      const section = element.closest<HTMLElement>('section')
+      const visibleRatio = getVisibleRatio(section ?? element)
+
+      if (visibleRatio >= 0.55) {
+        return urgentWaitMs
+      }
+
+      if (visibleRatio >= revealVisibleRatio) {
+        return Math.min(baseWaitMs, 900)
+      }
+
+      return baseWaitMs
+    }
 
     function scheduleDelayedRevealCheck(delayMs: number) {
-      if (revealWakeTimer) {
+      const nextDueAt = window.performance.now() + delayMs
+
+      if (revealWakeTimer && revealWakeDueAt <= nextDueAt) {
         return
       }
 
+      if (revealWakeTimer) {
+        window.clearTimeout(revealWakeTimer)
+      }
+
+      revealWakeDueAt = nextDueAt
       revealWakeTimer = window.setTimeout(() => {
         revealWakeTimer = 0
+        revealWakeDueAt = 0
         scheduleRevealCheck()
       }, delayMs)
     }
@@ -368,7 +429,31 @@ function App() {
         revealStartedAt.get(olivePlateElement) ?? 0,
       )
 
-      const remainingRevealMs = 4200 - (window.performance.now() - eventLocationRevealStartedAt)
+      const waitMs = getScrollResponsiveWaitMs(element, 1800, 320)
+      const remainingRevealMs = waitMs - (window.performance.now() - eventLocationRevealStartedAt)
+
+      if (remainingRevealMs <= 0) {
+        return false
+      }
+
+      scheduleDelayedRevealCheck(remainingRevealMs + 80)
+      return true
+    }
+
+    const shouldWaitForImportantReveal = (element: HTMLElement) => {
+      if (!desktopMotionQuery.matches || !element.closest('.dress-code')) {
+        return false
+      }
+
+      const importantCard = document.querySelector<HTMLElement>('.important-card[data-reveal]')
+
+      if (!importantCard?.classList.contains('is-visible')) {
+        return true
+      }
+
+      const importantRevealStartedAt = revealStartedAt.get(importantCard) ?? 0
+      const waitMs = getScrollResponsiveWaitMs(element, 1300, 260)
+      const remainingRevealMs = waitMs - (window.performance.now() - importantRevealStartedAt)
 
       if (remainingRevealMs <= 0) {
         return false
@@ -379,12 +464,16 @@ function App() {
     }
 
     const shouldRevealElement = (element: HTMLElement) => {
-      if (shouldWaitForEventLocationReveal(element)) {
+      if (shouldWaitForEventLocationReveal(element) || shouldWaitForImportantReveal(element)) {
         return false
       }
 
+      if (shouldRevealIntroElement(element) || shouldRevealFarewellElement(element)) {
+        return true
+      }
+
       if (!shouldSequenceRevealWithScroll(element)) {
-        return getVisibleRatio(element) >= 0.4
+        return getVisibleRatio(element) >= revealVisibleRatio
       }
 
       const rect = element.getBoundingClientRect()
@@ -423,7 +512,7 @@ function App() {
             return
           }
 
-          if (shouldWaitForEventLocationReveal(entry.target as HTMLElement)) {
+          if (shouldWaitForEventLocationReveal(entry.target as HTMLElement) || shouldWaitForImportantReveal(entry.target as HTMLElement)) {
             scheduleRevealCheck()
             return
           }
@@ -613,13 +702,15 @@ function App() {
                   alt="Карта ресторана NOVO"
                   aria-hidden={isMapReady}
                 />
-                <iframe
-                  src={mapIframeSrc}
-                  title="Интерактивная карта места проведения свадьбы"
-                  loading="eager"
-                  referrerPolicy="no-referrer-when-downgrade"
-                  onLoad={() => mapIframeSrc && window.setTimeout(() => setIsMapReady(true), 1300)}
-                />
+                {mapIframeSrc ? (
+                  <iframe
+                    src={mapIframeSrc}
+                    title="Интерактивная карта места проведения свадьбы"
+                    loading="eager"
+                    referrerPolicy="no-referrer-when-downgrade"
+                    onLoad={() => window.setTimeout(() => setIsMapReady(true), 1300)}
+                  />
+                ) : null}
             </div>
             <div className="map-details">
               <h2 className="venue-title" data-reveal="fade-up" style={revealDelay(320)}>Место проведения</h2>
@@ -720,7 +811,7 @@ function App() {
                   ))}
                 </fieldset>
 
-                <button type="submit" disabled={hasSubmittedRsvp}>
+                <button type="submit" disabled={hasSubmittedRsvp} data-reveal="fade-up" style={revealDelay(760)}>
                   {hasSubmittedRsvp ? 'Ответ принят' : 'Отправить'}
                 </button>
                 {(rsvpStatus === 'success' || hasSubmittedRsvp) && (
