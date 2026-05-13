@@ -1730,7 +1730,7 @@
   transform: translateX(-4px);
 }
 
-.rsvp-card.is-visible .rsvp-form button[data-reveal]:not(:hover) {
+.rsvp-card.is-visible .rsvp-form button[data-reveal] {
   opacity: 1;
   filter: none;
   transform: translate3d(0, 0, 0);
@@ -1755,6 +1755,9 @@
 
 .rsvp-form button.is-submitted:disabled {
   opacity: 1;
+  filter: none;
+  pointer-events: none;
+  transform: translate3d(0, 0, 0);
 }
 
 .rsvp-status {
