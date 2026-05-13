@@ -1977,7 +1977,8 @@
     --hero-mobile-scale: max(calc(100vw / var(--hero-mobile-width)), calc(100svh / var(--hero-mobile-height)));
     --hero-title-top: calc(var(--hero-mobile-scale) * 140);
     --hero-title-to-bottom-gap: calc(var(--hero-mobile-scale) * 50);
-    --hero-arrow-bottom: calc(var(--hero-mobile-scale) * 80);
+    --hero-save-date-top: calc(var(--hero-title-top) + (var(--hero-mobile-scale) * 368));
+    --hero-arrow-top: calc(var(--hero-title-top) + (var(--hero-mobile-scale) * 467));
     --hero-arrow-size: calc(var(--hero-mobile-scale) * 29.16);
 
     height: 100svh;
@@ -2039,8 +2040,8 @@
   .hero-save-date {
     position: absolute;
     z-index: 1;
-    top: auto;
-    bottom: calc(var(--hero-mobile-scale) * 215);
+    top: var(--hero-save-date-top);
+    bottom: auto;
     left: calc(50% - 0.06vw);
     display: block;
     width: calc(var(--hero-mobile-scale) * 270);
@@ -2098,8 +2099,8 @@
 
   .hero-scroll {
     left: 50%;
-    top: auto;
-    bottom: 125px;
+    top: var(--hero-arrow-top);
+    bottom: auto;
     width: var(--hero-arrow-size);
     height: var(--hero-arrow-size);
     transform: translateX(-50%);
