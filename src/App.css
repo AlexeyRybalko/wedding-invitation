@@ -432,6 +432,7 @@
   left: var(--hero-content-x);
   width: clamp(34px, 3.3vh, 62px);
   height: clamp(34px, 3.3vh, 62px);
+  opacity: 0;
   transform: translateX(-50%);
   pointer-events: none;
 }
@@ -510,7 +511,9 @@
 }
 
 .page.is-page-ready .hero-scroll {
-  animation: hero-scroll-float 2600ms ease-in-out 5200ms infinite;
+  animation:
+    hero-scroll-appear 500ms ease 7350ms both,
+    hero-scroll-float 2600ms ease-in-out 7600ms infinite;
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -635,6 +638,12 @@
 
   50% {
     transform: translateX(-50%) translateY(8px);
+  }
+}
+
+@keyframes hero-scroll-appear {
+  to {
+    opacity: 1;
   }
 }
 
@@ -1977,8 +1986,8 @@
     --hero-mobile-scale: max(calc(100vw / var(--hero-mobile-width)), calc(100svh / var(--hero-mobile-height)));
     --hero-title-top: calc(var(--hero-mobile-scale) * 140);
     --hero-title-to-bottom-gap: calc(var(--hero-mobile-scale) * 50);
-    --hero-save-date-top: calc(var(--hero-title-top) + (var(--hero-mobile-scale) * 402));
-    --hero-arrow-top: calc(var(--hero-title-top) + (var(--hero-mobile-scale) * 487));
+    --hero-save-date-top: calc(var(--hero-title-top) + (var(--hero-mobile-scale) * 384));
+    --hero-arrow-top: calc(var(--hero-title-top) + (var(--hero-mobile-scale) * 479));
     --hero-arrow-size: calc(var(--hero-mobile-scale) * 29.16);
 
     height: 100svh;
@@ -3674,6 +3683,7 @@
   }
 
   .page.is-page-ready .hero-scroll {
+    opacity: 1 !important;
     transform: translateX(-50%) !important;
   }
 
