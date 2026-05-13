@@ -1724,6 +1724,12 @@
   animation: button-shine 1800ms ease-out infinite;
 }
 
+.rsvp-submit-button.is-submitted .rsvp-submit-loader {
+  width: 0;
+  opacity: 0;
+  transform: translateX(-4px);
+}
+
 .rsvp-card.is-visible .rsvp-form button[data-reveal]:not(:hover) {
   opacity: 1;
   filter: none;
@@ -1745,6 +1751,10 @@
 
 .rsvp-form button.is-submitting:disabled {
   opacity: 0.94;
+}
+
+.rsvp-form button.is-submitted:disabled {
+  opacity: 1;
 }
 
 .rsvp-status {
@@ -3567,6 +3577,13 @@
       transform 1420ms cubic-bezier(0.22, 1, 0.36, 1) calc(var(--reveal-mobile-delay) + 70ms),
       box-shadow 220ms ease,
       background-color 220ms ease !important;
+  }
+
+  .rsvp-card .rsvp-submit-button.is-submitting[data-reveal],
+  .rsvp-card .rsvp-submit-button.is-submitted[data-reveal] {
+    opacity: 1 !important;
+    filter: none !important;
+    transform: translate3d(0, 0, 0) !important;
   }
 
   .timer-card[data-reveal],
