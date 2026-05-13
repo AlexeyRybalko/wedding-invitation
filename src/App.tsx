@@ -824,7 +824,7 @@ function App() {
 
                 <button
                   type="submit"
-                  className={`rsvp-submit-button${isRsvpSubmitting ? ' is-submitting' : ''}${hasSubmittedRsvp ? ' is-submitted' : ''}`}
+                  className={`rsvp-submit-button${isRsvpSubmitting ? ' is-submitting is-visible' : ''}${hasSubmittedRsvp ? ' is-submitted is-visible' : ''}`}
                   disabled={hasSubmittedRsvp || isRsvpSubmitting}
                   aria-busy={isRsvpSubmitting}
                   data-reveal="fade-up"
