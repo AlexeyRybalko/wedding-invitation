@@ -1,0 +1,117 @@
+name: Deploy to Cloud.ru
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cloudru
+  cancel-in-progress: false
+
+env:
+  CLOUDRU_BUCKET: wedding-invitation
+  CLOUDRU_ENDPOINT: https://s3.cloud.ru
+  AWS_DEFAULT_REGION: ru-central-1
+  AWS_ACCESS_KEY_ID: ${{ secrets.CLOUDRU_TENANT_ID }}:${{ secrets.CLOUDRU_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.CLOUDRU_KEY_SECRET }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build for Cloud.ru
+        run: npm run build
+        env:
+          NETLIFY: true
+          VITE_RSVP_ENDPOINT: ${{ secrets.VITE_RSVP_ENDPOINT }}
+
+      - name: Install AWS CLI
+        run: |
+          python -m pip install --user awscli
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Clear bucket
+        run: aws s3 rm "s3://$CLOUDRU_BUCKET" --recursive --endpoint-url "$CLOUDRU_ENDPOINT"
+
+      - name: Upload HTML
+        run: >
+          aws s3 cp dist "s3://$CLOUDRU_BUCKET"
+          --recursive
+          --exclude "*"
+          --include "*.html"
+          --content-type "text/html; charset=utf-8"
+          --endpoint-url "$CLOUDRU_ENDPOINT"
+
+      - name: Upload CSS
+        run: >
+          aws s3 cp dist "s3://$CLOUDRU_BUCKET"
+          --recursive
+          --exclude "*"
+          --include "*.css"
+          --content-type "text/css; charset=utf-8"
+          --endpoint-url "$CLOUDRU_ENDPOINT"
+
+      - name: Upload JavaScript
+        run: >
+          aws s3 cp dist "s3://$CLOUDRU_BUCKET"
+          --recursive
+          --exclude "*"
+          --include "*.js"
+          --content-type "application/javascript; charset=utf-8"
+          --endpoint-url "$CLOUDRU_ENDPOINT"
+
+      - name: Upload PNG images
+        run: >
+          aws s3 cp dist "s3://$CLOUDRU_BUCKET"
+          --recursive
+          --exclude "*"
+          --include "*.png"
+          --content-type "image/png"
+          --endpoint-url "$CLOUDRU_ENDPOINT"
+
+      - name: Upload WebP images
+        run: >
+          aws s3 cp dist "s3://$CLOUDRU_BUCKET"
+          --recursive
+          --exclude "*"
+          --include "*.webp"
+          --content-type "image/webp"
+          --endpoint-url "$CLOUDRU_ENDPOINT"
+
+      - name: Upload fonts
+        run: >
+          aws s3 cp dist "s3://$CLOUDRU_BUCKET"
+          --recursive
+          --exclude "*"
+          --include "*.ttf"
+          --content-type "font/ttf"
+          --endpoint-url "$CLOUDRU_ENDPOINT"
+
+      - name: Upload fallback assets
+        run: >
+          aws s3 cp dist "s3://$CLOUDRU_BUCKET"
+          --recursive
+          --exclude "*.html"
+          --exclude "*.css"
+          --exclude "*.js"
+          --exclude "*.png"
+          --exclude "*.webp"
+          --exclude "*.ttf"
+          --endpoint-url "$CLOUDRU_ENDPOINT"
