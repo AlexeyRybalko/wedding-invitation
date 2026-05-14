@@ -39,7 +39,7 @@ jobs:
       - name: Build for Cloud.ru
         run: npm run build
         env:
-          NETLIFY: true
+          VITE_SITE_BASE: /
           VITE_RSVP_ENDPOINT: ${{ secrets.VITE_RSVP_ENDPOINT }}
 
       - name: Install AWS CLI
