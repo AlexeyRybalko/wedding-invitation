@@ -7,7 +7,7 @@ import desktopBackground from './assets/desktop-background.webp'
 import dressColorOne from './assets/dress-color-1.png'
 import dressColorTwo from './assets/dress-color-2.png'
 import dressColorThree from './assets/dress-color-3.png'
-import dressColorFour from './assets/dress-color-4.png'
+import dressColorFive from './assets/dress-color-5.png'
 import eventIconDinner from './assets/event-icon-dinner-round.png'
 import eventIconGlasses from './assets/event-icon-glasses-round.png'
 import eventIconRings from './assets/event-icon-rings-round.png'
@@ -65,7 +65,7 @@ const dressColors = [
   { src: dressColorOne, alt: 'Тёмный зелёный оттенок' },
   { src: dressColorTwo, alt: 'Серо-зелёный оттенок' },
   { src: dressColorThree, alt: 'Песочный оттенок' },
-  { src: dressColorFour, alt: 'Светлый молочный оттенок' },
+  { src: dressColorFive, alt: 'Тёплый коричневый оттенок' },
 ] as const
 
 const rsvpOptions = [
@@ -89,7 +89,7 @@ const commonImageAssets = [
   dressColorOne,
   dressColorTwo,
   dressColorThree,
-  dressColorFour,
+  dressColorFive,
   eventIconDinner,
   eventIconGlasses,
   eventIconRings,
